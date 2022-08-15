@@ -20,17 +20,17 @@ class Tests_LearningStrategy {
 	@Test
 	void testBasicRandomInitalization() {
 		FitnessLandscape landscape = new FitnessLandscape(5, 0);
-		int[] startingLocation = {0, 0, 0, 0, 0};
+		int startingLocation = 0;
 		LearningStrategy testStrategy = new LearningStrategy(landscape, 10, startingLocation);
 		
 		System.out.println("Randomly generated strategy: ");
 		System.out.println(testStrategy.strategy);
 		System.out.println("Starting location: ");
-		System.out.println(NDArrayManager.array1dAsString(testStrategy.genotype));
+		System.out.println((testStrategy.genotype));
 		
 		
 		Assertions.assertEquals(10, testStrategy.strategy.size());
-		Assertions.assertEquals(5, testStrategy.genotype.length);
+//		Assertions.assertGreaterThan(2<<n, testStrategy.genotype);
 	}
 
 	/**
@@ -49,7 +49,7 @@ class Tests_LearningStrategy {
 		{
 			strategy.add(new WalkStep());
 		}
-		int[] startingLocation = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		int startingLocation = 0;//{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		
 		LearningStrategy testStrategy = new LearningStrategy(landscape, strategy, startingLocation);
 		double previousFitness = testStrategy.genotypeFitness;
@@ -71,7 +71,7 @@ class Tests_LearningStrategy {
 		{
 			strategy.add(new LookStep());
 		}
-		int[] startingLocation = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		int startingLocation = 0;//{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		
 		LearningStrategy testStrategy = new LearningStrategy(landscape, strategy, startingLocation);
 		double previousFitness = testStrategy.genotypeFitness;
@@ -95,7 +95,7 @@ class Tests_LearningStrategy {
 		}
 		strategy.add(new WalkStep());
 		
-		int[] startingLocation = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		int startingLocation = 0; //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		
 		LearningStrategy testStrategy = new LearningStrategy(landscape, strategy, startingLocation);
 		double previousFitness = testStrategy.genotypeFitness;
@@ -121,7 +121,7 @@ class Tests_LearningStrategy {
 			strategy.add(new WalkStep());
 		}
 		
-		int[] startingLocation = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		int startingLocation = 0;//{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		
 		LearningStrategy testStrategy = new LearningStrategy(landscape, strategy, startingLocation);
 		double previousFitness = testStrategy.genotypeFitness;

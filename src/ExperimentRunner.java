@@ -153,7 +153,7 @@ public class ExperimentRunner {
 					FitnessLandscape landscape = new FitnessLandscape(n, thisk, SeededRandom.rnd.nextInt());
 					for(int start = 0; start < starts; start++)
 					{
-						int[] startingLocation = NDArrayManager.array1dRandInt(n, 2);
+						int startingLocation = SeededRandom.rnd.nextInt(n);//NDArrayManager.array1dRandInt(n, 2);
 						//Setup comparison strategies
 //						Map<String, LearningStrategy> comparisonStrategies = new HashMap<String, LearningStrategy>();
 //						

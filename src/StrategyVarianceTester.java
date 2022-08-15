@@ -22,7 +22,7 @@ public class StrategyVarianceTester {
 		}
 		
 		FitnessLandscape testLandscape = new FitnessLandscape(n, k);
-		int[] testLocation = NDArrayManager.array1dRandInt(n, 2);
+		int testLocation = SeededRandom.rnd.nextInt(n);//NDArrayManager.array1dRandInt(n, 2);
 		LearningStrategy testStrat = new LearningStrategy(testLandscape, 50, testLocation);
 		
 		ArrayList<LearningStrategy> testStrats = new ArrayList<LearningStrategy>();
