@@ -6,52 +6,58 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import config.PropParser;
+
 public class ExperimentRunner {
 	
 	
 	public static void main(String[] args) {
+		
+		String filename = "src/config.properties";
+		PropParser.load(filename);
+		
 //		//Strategy Parameters
-		int strategyLength = 200;
-		int sensitivity = 1;
-		int maxSensitivity = 1; //Set this equal to sensitivity for a single sensitiviry run
-		int sensitivityInceremet = 1;
+		int strategyLength = Integer.parseInt(PropParser.getProperty("strategyLength"));
+		int sensitivity = Integer.parseInt(PropParser.getProperty("sensitivity"));
+		int maxSensitivity = Integer.parseInt(PropParser.getProperty("maxSensitivity")); //Set this equal to sensitivity for a single sensitiviry run
+		int sensitivityInceremet = Integer.parseInt(PropParser.getProperty("sensitivityInceremet"));
 		
 		//Set to 0 if you don't want to control
-		int numberOfWalks = 40;
+		int numberOfWalks = Integer.parseInt(PropParser.getProperty("numberOfWalks"));
 		LearningStrategy.setNumberOfWalks = numberOfWalks;
-		LearningStrategy.usingWait = false;
+		LearningStrategy.usingWait = Boolean.parseBoolean(PropParser.getProperty("usingWait"));
 
 		//Landscape Parameters
-		int n = 15;
-		int setk = 14;
-		int k = setk;
-		int maxk = setk; //Set this equal to k for a single k run
-		int kincrement = 1;
+		int n = Integer.parseInt(PropParser.getProperty("n"));
+		int setk = Integer.parseInt(PropParser.getProperty("setk"));
+		int k = Integer.parseInt(PropParser.getProperty("k"));
+		int maxk = Integer.parseInt(PropParser.getProperty("maxk")); //Set this equal to k for a single k run
+		int kincrement = Integer.parseInt(PropParser.getProperty("kincrement"));
 		
 		//Evolution Parameters
-		String selectionType = "mutation"; 
-		int numGenerations = 50;
-		int popsPerGeneration = 100;
-		int childrenPercentage = 50; //always set to 100 for ranked
-		double mutationPercentage = 2;
+		String selectionType = PropParser.getProperty("selectionType"); 
+		int numGenerations = Integer.parseInt(PropParser.getProperty("numGenerations"));
+		int popsPerGeneration = Integer.parseInt(PropParser.getProperty("popsPerGeneration"));
+		int childrenPercentage = Integer.parseInt(PropParser.getProperty("childrenPercentage")); //always set to 100 for ranked
+		double mutationPercentage = Double.parseDouble(PropParser.getProperty("mutationPercentage"));
 		
 		//Seed parameters
-		long seed = 500; //Set Seed
+		long seed = Integer.parseInt(PropParser.getProperty("seed")); //Set Seed
 //		long seed = SeededRandom.rnd.nextInt(); //Random seed
 		SeededRandom.rnd.setSeed(seed);
 
 		//Data Reporting Parameters
-		int incrementCSVoutput = 50;
-		String experimentName = "Experiment_" + seed + "_" + selectionType + "k=" + k;
+		int incrementCSVoutput = Integer.parseInt(PropParser.getProperty("incrementCSVoutput"));
+		String experimentName = "Config_Experiment_" + seed + "_" + selectionType + "k=" + k;
 		PrintWriter csvWriter;
 		File csvFile = new File(experimentName);
 
 		
 		//Num Simulation Parameters
-		int simulations = 500;
-		int starts = 1;
-		int runs = 1;
-		int strategyRuns = 25;
+		int simulations = Integer.parseInt(PropParser.getProperty("simulations"));
+		int starts = Integer.parseInt(PropParser.getProperty("starts"));
+		int runs = Integer.parseInt(PropParser.getProperty("runs"));
+		int strategyRuns = Integer.parseInt(PropParser.getProperty("strategyRuns"));
 		
 		
 		
