@@ -102,7 +102,7 @@ public class FitnessLandscape {
 				{
 					int neighborIndex = (gene + neighbor) % n;
 //					interactions[neighbor] = genotype[neighborIndex];
-					interactions = interactions|((genotypeInt>>>neighborIndex)&1)<<neighbor;
+					interactions = interactions|((genotypeInt>>>(n-1-neighborIndex))&1)<<(k-neighbor);
 				}
 //				int index = gen2ind(interactions);
 				
@@ -276,39 +276,39 @@ public class FitnessLandscape {
 	 * @param n standard 'N' of the NKFL
 	 * @return the genotype as a bitstring
 	 */
-//	public static int[] ind2gen(int index, int n) {
-//		int[] genotype = new int[n]; // not correct. need to find how to use np
-//		if (index >= Math.pow(2, n)) {
-//			System.out.println("ind2gen error");
-//			return genotype;
-//		}
-//		while (n > 0) {
-//			n = n - 1;
-//			if (index % 2 == 0) {
-//				genotype[n] = 0;
-//			} else {
-//				genotype[n] = 1;
-//			}
-//			index = index / 2; // this is floor division right?
-//		}
-//		return genotype;
-//	}
+	public static int[] ind2gen(int index, int n) {
+		int[] genotype = new int[n]; // not correct. need to find how to use np
+		if (index >= Math.pow(2, n)) {
+			System.out.println("ind2gen error");
+			return genotype;
+		}
+		while (n > 0) {
+			n = n - 1;
+			if (index % 2 == 0) {
+				genotype[n] = 0;
+			} else {
+				genotype[n] = 1;
+			}
+			index = index / 2; // this is floor division right?
+		}
+		return genotype;
+	}
 
 	/**
 	 * Takes a bitstring (genotype) and turns it into an int
 	 * @param genotype bitstring that is the genotype
 	 * @return the genotype as an integer
 	 */
-//	public static int gen2ind(int[] genotype) {
-//		int i = 0;
-//		int index = 0;
-//		int amount = genotype.length;
-//		while (i < amount) {
-//			index += genotype[i] * Math.pow(2, (amount - i - 1));
-//			i++;
-//		}
-//		return (int) (index);
-//	}
+	public static int gen2ind(int[] genotype) {
+		int i = 0;
+		int index = 0;
+		int amount = genotype.length;
+		while (i < amount) {
+			index += genotype[i] * Math.pow(2, (amount - i - 1));
+			i++;
+		}
+		return (int) (index);
+	}
 	
 	public static int[] copyArray(int[] source)
 	{
