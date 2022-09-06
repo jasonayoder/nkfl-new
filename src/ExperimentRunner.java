@@ -12,9 +12,12 @@ public class ExperimentRunner {
 	
 	
 	public static void main(String[] args) {
-		
 		String filename = "src/config.properties";
-		PropParser.load(filename);
+		run(filename);
+	}
+	public static void run(String configPath) {
+		
+		PropParser.load(configPath);
 		
 //		//Strategy Parameters
 		int strategyLength = Integer.parseInt(PropParser.getProperty("strategyLength"));
