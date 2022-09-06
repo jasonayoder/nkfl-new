@@ -214,7 +214,7 @@ public class FitnessLandscape {
 		double testFitness;
 		for(int i = 0; i < n; i++)
 		{
-			int temp = greatest ^ (1<<i);
+			int temp = location ^ (1<<i);
 			testFitness = this.fitness(temp);
 			if (testFitness > greatestFitness) {
 				greatest = temp;

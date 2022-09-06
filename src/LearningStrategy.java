@@ -208,17 +208,14 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 					
 					this.phenotype = current.execute(landscape, phenotype, lookedLocations);
 					this.phenotypeFitness = landscape.fitness(phenotype);
-
-
-					avgFitnessArray[i] += this.phenotypeFitness;
-//					fitnessArray[i] += this.phenotypeFitness;
+					fitnessArray[i] = this.phenotypeFitness;
 				}
 				
-//				for(int i = 0; i < fitnessArray.length; i++)
-//				{
-//					avgFitnessArray[i] += fitnessArray[i];
-//					fitnessArray[i] = 0;
-//				}
+				for(int i = 0; i < fitnessArray.length; i++)
+				{
+					avgFitnessArray[i] += fitnessArray[i];
+					fitnessArray[i] = 0;
+				}
 				this.phenotype = this.genotype;
 				this.phenotypeFitness = this.genotypeFitness;
 			}

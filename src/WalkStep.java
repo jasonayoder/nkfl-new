@@ -17,7 +17,7 @@ public class WalkStep extends Step {
 			//RW
 			int location = SeededRandom.rnd.nextInt(landscape.n);
 			int newPhenotype = phenotype;
-			newPhenotype = newPhenotype ^ (1<<location) ;
+			newPhenotype = newPhenotype ^ (1<<(landscape.n-1-location)) ;
 			return newPhenotype;
 		}
 		else
@@ -30,7 +30,7 @@ public class WalkStep extends Step {
 			for(Integer location : lookedLocations)
 			{
 				int newPhenotype = phenotype;
-				newPhenotype = newPhenotype ^ (1<<location);
+				newPhenotype = newPhenotype ^ (1<<(landscape.n-1-location));
 				double newPhenotypeFitness = landscape.fitness(newPhenotype);
 				
 				if(newPhenotypeFitness > bestPhenotypeFitness)
