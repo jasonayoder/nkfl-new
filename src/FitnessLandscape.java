@@ -83,7 +83,7 @@ public class FitnessLandscape {
 	 *                         the fitness table
 	 */
 	public void generateFitnessTable(double[][] interactionTable) {
-		double[] fitnessTable = new double[(int) Math.pow(2, n)];
+		double[] fitnessTable = new double[1<<n];
 		double minFitness = 100000;
 		double maxFitness = 0;
 
@@ -92,18 +92,21 @@ public class FitnessLandscape {
 																						// genotype [1, 0, 1] == 5)
 		{
 			double fitness = 0;
-			int[] genotype = ind2gen(genotypeInt, this.n); // Gets the bitstring for the genotype
+//			int[] genotype = ind2gen(genotypeInt, this.n); // Gets the bitstring for the genotype
 
 			for (int gene = 0; gene < n; gene++) // loops through each gene (bit)
 			{
-				int[] interactions = new int[k + 1]; // called 'subgen' in python code
+				//int[] interactions = new int[k + 1]; // called 'subgen' in python code
+				int interactions = 0;
 				for (int neighbor = 0; neighbor < k + 1; neighbor++) // loop through all our neighbors
 				{
 					int neighborIndex = (gene + neighbor) % n;
-					interactions[neighbor] = genotype[neighborIndex];
+//					interactions[neighbor] = genotype[neighborIndex];
+					interactions = interactions|((genotypeInt>>>(n-1-neighborIndex))&1)<<(k-neighbor);
 				}
-				int index = gen2ind(interactions);
-				fitness += interactionTable[gene][index]; // add our neighbor's fitness to our own
+//				int index = gen2ind(interactions);
+				
+				fitness += interactionTable[gene][interactions]; // add our neighbor's fitness to our own
 			}
 			fitnessTable[genotypeInt] = fitness; // store our calculated fitness
 
@@ -176,18 +179,16 @@ public class FitnessLandscape {
 	 * @param genotype bitstring representation of genotype
 	 * @return
 	 */
-	public double fitness(int[] genotype) {
-		int index = FitnessLandscape.gen2ind(genotype);
-		return fitTable[index];
+	public double fitness(int genotype) {
+		return fitTable[genotype];
 	}
 
 	/**
 	 * takes a bitstring (genotype) and marks its location on the landscape as 'visited'
 	 * @param genotype
 	 */
-	public void visited(int[] genotype) {
-		int index = FitnessLandscape.gen2ind(genotype);
-		visitedTable[index] = 1;
+	public void visited(int genotype) {
+		visitedTable[genotype] = 1;
 	}
 
 	/**
@@ -205,45 +206,34 @@ public class FitnessLandscape {
 	
 	//Not used by the landscape itself, but called by learning strategies to find their greatest neighbor
 	//Copies a lot of arrays to avoid altering location data
-	public int[] greatestNeighbor(int[] location)
+	public int greatestNeighbor(int location)
 	{
-		int[] greatest = copyArray(location);
+		int greatest = location;
 		double greatestFitness = this.fitness(greatest);
 		
-		if(location.length != n) //invalid location
-		{
-			return null;
-		}
-		int[] testArray = copyArray(location);
 		double testFitness;
 		for(int i = 0; i < n; i++)
 		{
-			testArray[i] = (testArray[i] + 1) % 2; //flip bit to test
-
-			testFitness = this.fitness(testArray);
+			int temp = location ^ (1<<i);
+			testFitness = this.fitness(temp);
 			if (testFitness > greatestFitness) {
-				greatest = copyArray(testArray);
+				greatest = temp;
 				greatestFitness = testFitness;
 			}
-
-			testArray[i] = (testArray[i] + 1) % 2; //flip it back
 		}
 		return greatest;
 	}
 	
-	public boolean isLocalMaxima(int[] sourceGenotype)
+	public boolean isLocalMaxima(int genotype)
 	{
-		int[] genotype = copyArray(sourceGenotype);//Don't want to corrupt our source
 		double fitness = this.fitness(genotype);
 
-		for (int i = 0; i < genotype.length; i++) {
-			genotype[i] = (genotype[i] + 1) % 2;
+		for (int i = 0; i < n; i++) {
+			int neighbor = genotype^(1<<i);
 
-			if (this.fitness(genotype) > fitness) {
+			if (this.fitness(neighbor) > fitness) {
 				return false;
 			}
-
-			genotype[i] = (genotype[i] + 1) % 2;
 		}
 
 		return true;
@@ -264,7 +254,7 @@ public class FitnessLandscape {
 		return gen.averageFitness();
 	}
 	
-	public StrategyGeneration testStrategyOnLandscape(ArrayList<Step> strategy, int numTests, int[] startingLocation)
+	public StrategyGeneration testStrategyOnLandscape(ArrayList<Step> strategy, int numTests, int startingLocation)
 	{
 		ArrayList<LearningStrategy> strategies = new ArrayList<LearningStrategy>();
 

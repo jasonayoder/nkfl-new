@@ -18,7 +18,7 @@ public class StrategyGeneration {
 	
 	public ArrayList<LearningStrategy> strategies = new ArrayList<LearningStrategy>();
 	public FitnessLandscape landscape;
-	public int[] startingLocation;
+	public int startingLocation;
 	public int strategyLength;
 	
 	/**
@@ -29,7 +29,7 @@ public class StrategyGeneration {
 	 * @param numStrategies Number of strategies
 	 * @param strategyLength Length of the strategies
 	 */
-	public StrategyGeneration(FitnessLandscape landscape, int numStrategies, int strategyLength, int[] startingLocation)
+	public StrategyGeneration(FitnessLandscape landscape, int numStrategies, int strategyLength, int startingLocation)
 	{
 		this.landscape = landscape;
 		this.strategyLength = strategyLength;

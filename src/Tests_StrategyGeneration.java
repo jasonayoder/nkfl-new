@@ -13,7 +13,7 @@ class Tests_StrategyGeneration {
 	@Test
 	void testBasicGenerationDeclaration() {
 		FitnessLandscape landscape = new FitnessLandscape(15, 3);
-		int[] startingLocation = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		int startingLocation = 0;//{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		StrategyGeneration gen = new StrategyGeneration(landscape, 1000, 10, startingLocation);
 		Assertions.assertEquals(1000, gen.strategies.size());
 		Assertions.assertEquals(gen.landscape, landscape);
@@ -23,7 +23,7 @@ class Tests_StrategyGeneration {
 	@Test
 	void testSorting() {
 		FitnessLandscape landscape = new FitnessLandscape(20, 3);
-		int[] startingLocation = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		int startingLocation = 0;//{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		ArrayList<LearningStrategy> strategyList = new ArrayList<LearningStrategy>();
 		for(int i = 0; i < 10; i++)
 		{

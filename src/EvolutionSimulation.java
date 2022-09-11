@@ -15,7 +15,7 @@ public class EvolutionSimulation {
 	int childrenPerGeneration;
 	double mutationPercentage; //% mutation rate
 	int strategyLength;
-	int[] startingLocation;
+	int startingLocation;
 	FitnessLandscape landscape;
 	String simNum = "N/A";
 	String evolutionType = "N/A";
@@ -25,7 +25,7 @@ public class EvolutionSimulation {
 	public ArrayList<StrategyGeneration> generations = new ArrayList<StrategyGeneration>();
 	//generations ArrayList contains which step we are on
 	
-	public EvolutionSimulation(FitnessLandscape landscape, int popsPerGeneration, int numGenerations, double mutationPercentage, int strategyLength, double percentNewPerGeneration, int[] startingLocation, String evolutionType, int strategyRuns)
+	public EvolutionSimulation(FitnessLandscape landscape, int popsPerGeneration, int numGenerations, double mutationPercentage, int strategyLength, double percentNewPerGeneration, int startingLocation, String evolutionType, int strategyRuns)
 	{
 		this.landscape = landscape;
 		this.popsPerGeneration = popsPerGeneration;
@@ -38,7 +38,7 @@ public class EvolutionSimulation {
 		this.strategyRuns = strategyRuns;
 		setupSimulation();
 	}
-	
+
 	public void setStringNum(String simNum)
 	{
 		this.simNum = simNum;
@@ -100,9 +100,9 @@ public class EvolutionSimulation {
 	static final String FitnessRowHeader = "FITNESS_ROW";
 	static final String ComparisonStrategyHeader = "COMPARISON_STRATEGIES";
 	static final int numTestsForComparison = 1000;
-	public void writeExperimentToCSV(PrintWriter csvWriter, Map<String, ArrayList<Step>> comparisonStrategies, int csvIncrement)
+	public void writeExperimentToCSV(PrintWriter csvWriter, Map<String, ArrayList<Step>> comparisonStrategies, int csvIncrement, int n)
 	{
-		csvWriter.print(SimulationHeader + "," + simNum + "," + "Sensitivity: " + LookStep.DEFAULT_NUM_CHECKS  + "," + "Landscape seed: " + landscape.landscapeSeed + "," + "Starting Location" + NDArrayManager.array1dAsString(startingLocation) + "," + "K Value:" + landscape.k + "\n");
+		csvWriter.print(SimulationHeader + "," + simNum + "," + "Sensitivity: " + LookStep.DEFAULT_NUM_CHECKS  + "," + "Landscape seed: " + landscape.landscapeSeed + "," + "Starting Location" + NDArrayManager.array1dAsString(FitnessLandscape.ind2gen(startingLocation,n)) + "," + "K Value:" + landscape.k + "\n");
 		for(int gen = 0; gen < generations.size(); gen += csvIncrement)
 		{
 			csvWriter.print(GenerationHeader + "," + gen + "\n");

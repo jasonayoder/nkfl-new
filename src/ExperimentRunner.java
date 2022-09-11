@@ -162,7 +162,7 @@ public class ExperimentRunner {
 					FitnessLandscape landscape = new FitnessLandscape(n, thisk, SeededRandom.rnd.nextInt());
 					for(int start = 0; start < starts; start++)
 					{
-						int[] startingLocation = NDArrayManager.array1dRandInt(n, 2);
+						int startingLocation = FitnessLandscape.gen2ind((NDArrayManager.array1dRandInt(n, 2)));
 						//Setup comparison strategies
 //						Map<String, LearningStrategy> comparisonStrategies = new HashMap<String, LearningStrategy>();
 //						
@@ -199,7 +199,7 @@ public class ExperimentRunner {
 							double simsLeft = numSimsTotal-numSim;
 							System.out.println(simNum + " complete, progress = " + 100*numSim/numSimsTotal + "%, estimated time remaning: " + timeOfLastRun*simsLeft/60 + " minutes");
 							
-							sim.writeExperimentToCSV(csvWriter, strats, incrementCSVoutput);
+							sim.writeExperimentToCSV(csvWriter, strats, incrementCSVoutput, n);
 							
 						}
 					}

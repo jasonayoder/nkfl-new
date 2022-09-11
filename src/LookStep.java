@@ -20,13 +20,13 @@ public class LookStep extends Step {
 
 	//Just add an index we haven't looked at yet to lookedLocations
 	@Override
-	public int[] execute(FitnessLandscape landscape, int[] phenotype, ArrayList<Integer> lookedLocations) {
+	public int execute(FitnessLandscape landscape, int phenotype, ArrayList<Integer> lookedLocations) {
 		for (int x = 0; x < numChecks; x++) {
-			if(lookedLocations.size() < phenotype.length)//clause to prevent infinite loops from overlooking
+			if(lookedLocations.size() < landscape.n)//clause to prevent infinite loops from overlooking
 			{
 				int lookIndex;
 				do {
-						lookIndex = SeededRandom.rnd.nextInt(phenotype.length);
+						lookIndex = SeededRandom.rnd.nextInt(landscape.n);
 				} while (lookedLocations.contains(lookIndex));
 				
 				lookedLocations.add(lookIndex);

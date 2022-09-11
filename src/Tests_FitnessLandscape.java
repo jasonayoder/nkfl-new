@@ -47,7 +47,7 @@ class Tests_FitnessLandscape {
 	 */
 	@Test
 	public void testNumPeaksBasic() {
-		int n = 15;
+		int n = 5;
 		FitnessLandscape landscape = new FitnessLandscape(n, 0); // Should have 1 peak
 		int numPeaks = findNumPeaks(landscape);
 
@@ -104,13 +104,13 @@ class Tests_FitnessLandscape {
 	 */
 	public int findNumPeaks(FitnessLandscape landscape) {
 		int n = landscape.n;
-		int[] genotype = new int[n];
+//		int[] genotype = new int[n];
 		int numPeaks = 0;
 
 		for (int i = 0; i < Math.pow(2, n); i++) {
-			genotype = FitnessLandscape.ind2gen(i, n);
-
-			if (greaterThanNeighbors(genotype, landscape)) {
+			//genotype = FitnessLandscape.ind2gen(i, n);
+			
+			if (greaterThanNeighbors(i, landscape)) {
 				numPeaks++;
 			}
 		}
@@ -123,19 +123,19 @@ class Tests_FitnessLandscape {
 	 * @param landscape landscape the genotype is in
 	 * @return boolean, true if it is a local maxima, false if it is not
 	 */
-	public boolean greaterThanNeighbors(int[] genotype, FitnessLandscape landscape) {
+	public boolean greaterThanNeighbors(int genotype, FitnessLandscape landscape) {
 		double fitness = landscape.fitness(genotype);
 		// To make this a little more efficient, this modifies the genotype array, and
 		// sets it back afterwards
 
-		for (int i = 0; i < genotype.length; i++) {
-			genotype[i] = (genotype[i] + 1) % 2;
-
-			if (landscape.fitness(genotype) > fitness) {
+		for (int i = 0; i < landscape.n; i++) {
+//			genotype[i] = (genotype[i] + 1) % 2;
+			int temp = genotype ^ (1<<i);
+			if (landscape.fitness(temp) > fitness) {
 				return false;
 			}
 
-			genotype[i] = (genotype[i] + 1) % 2;
+//			genotype[i] = (genotype[i] + 1) % 2;
 		}
 
 		return true;

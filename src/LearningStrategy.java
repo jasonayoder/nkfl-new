@@ -31,16 +31,16 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	public FitnessLandscape landscape; // This LearningStrategy's NKFL
 	public static boolean usingWait = false;
 	
-	public int[] phenotype; //
+	public int phenotype; //
 	public double phenotypeFitness; // the current fitness of the genotype
 	
-	public int[] genotype;
+	public int genotype;
 	public double genotypeFitness; // save this data so we don't have to recompute it every time we reset
 	
 	public boolean ignoreWalkNumber = false;
 	boolean strategyExecuted = false;
 	
-	public LearningStrategy(FitnessLandscape landscape, ArrayList<Step> strategy, int[] genotype, boolean ignoreWalkNumber) {
+	public LearningStrategy(FitnessLandscape landscape, ArrayList<Step> strategy, int genotype, boolean ignoreWalkNumber) {
 		this.ignoreWalkNumber = ignoreWalkNumber;
 		this.landscape = landscape;
 		this.strategy = new ArrayList<Step>();
@@ -59,7 +59,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	 * @param landscape     the FitnessLandscape of the LearningStrategy
 	 * @param strategyArray the array representing the strategy
 	 */
-	public LearningStrategy(FitnessLandscape landscape, ArrayList<Step> strategy, int[] genotype) {
+	public LearningStrategy(FitnessLandscape landscape, ArrayList<Step> strategy, int genotype) {
 		this.landscape = landscape;
 		this.strategy = new ArrayList<Step>();
 		
@@ -77,7 +77,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	 * @param landscape      the FitnessLandscape of the LearningStrategy
 	 * @param strategyLength the desired length of the strategy
 	 */
-	public LearningStrategy(FitnessLandscape landscape, int strategyLength, int[] genotype) {
+	public LearningStrategy(FitnessLandscape landscape, int strategyLength, int genotype) {
 		this.landscape = landscape;
 		
 		
@@ -91,12 +91,12 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		initializeArrays(genotype);
 	}
 	
-	private void initializeArrays(int[] genotype)
+	private void initializeArrays(int genotype)
 	{
 		this.phenotype = genotype;
 		this.phenotypeFitness = landscape.fitness(genotype);
 
-		this.genotype = NDArrayManager.copyArray1d(genotype);
+		this.genotype = genotype;
 		this.genotypeFitness = this.phenotypeFitness;
 		
 		//Set our original values
@@ -208,7 +208,6 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 					
 					this.phenotype = current.execute(landscape, phenotype, lookedLocations);
 					this.phenotypeFitness = landscape.fitness(phenotype);
-					
 					fitnessArray[i] = this.phenotypeFitness;
 				}
 				
@@ -217,7 +216,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 					avgFitnessArray[i] += fitnessArray[i];
 					fitnessArray[i] = 0;
 				}
-				this.phenotype = NDArrayManager.copyArray1d(this.genotype);
+				this.phenotype = this.genotype;
 				this.phenotypeFitness = this.genotypeFitness;
 			}
 			
@@ -250,7 +249,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 			childStrategy.add(step);
 		}
 		
-		LearningStrategy child = new LearningStrategy(landscape, childStrategy, NDArrayManager.copyArray1d(genotype), ignoreWalkNumber);
+		LearningStrategy child = new LearningStrategy(landscape, childStrategy, genotype, ignoreWalkNumber);
 		return child;
 	}
 	
@@ -263,7 +262,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 			childStrategy.add(step);
 		}
 		
-		LearningStrategy child = new LearningStrategy(landscape, childStrategy, NDArrayManager.copyArray1d(genotype), ignoreWalkNumber);
+		LearningStrategy child = new LearningStrategy(landscape, childStrategy, genotype, ignoreWalkNumber);
 		child.mutate(mutationRate);
 		return child;
 	}

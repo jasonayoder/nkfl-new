@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * @author Jackson Shen, Jacob Ashworth
  */
 public abstract class Step {
-	public abstract int[] execute(FitnessLandscape landscape, int[] phenotype, ArrayList<Integer> lookedLocations); // return the location after, should be the same after a ig step
+	public abstract int execute(FitnessLandscape landscape, int phenotype, ArrayList<Integer> lookedLocations); // return the location after, should be the same after a ig step
 	public Step() {
 	}
 	public abstract String getStepName();
