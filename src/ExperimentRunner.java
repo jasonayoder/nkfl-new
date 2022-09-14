@@ -8,13 +8,21 @@ import java.util.Map;
 
 import config.PropParser;
 
-public class ExperimentRunner {
+public class ExperimentRunner implements Runnable{
 	
-	
+	String configPath = "src/config.properties";
 	public static void main(String[] args) {
-		
-		String filename = "src/config.properties";
-		PropParser.load(filename);
+		ExperimentRunner runner = new ExperimentRunner();
+		runner.run();
+	}
+	
+	public void init(String configPath) {
+		this.configPath = configPath;
+	}
+	
+	public void run() {
+		System.out.println(configPath);
+		PropParser.load(configPath);
 		
 //		//Strategy Parameters
 		int strategyLength = Integer.parseInt(PropParser.getProperty("strategyLength"));
@@ -72,8 +80,8 @@ public class ExperimentRunner {
 		try {
 			csvWriter = new PrintWriter(csvFile + ".csv");
 		} catch (FileNotFoundException e) {
-			System.err.println("could not create csv writer");
-			e.printStackTrace();
+//			System.err.println("could not create csv writer");
+//			e.printStackTrace();
 			return;
 		}
 		
@@ -172,7 +180,7 @@ public class ExperimentRunner {
 						
 						for(int run = 0; run < runs; run++)
 						{
-							long startTime = System.currentTimeMillis()/1000;
+//							long startTime = System.currentTimeMillis()/1000;
 							numSim++;
 							String simNum = "" + thisk + "." + sense + "." + simulation + "." + start + "." + run;
 							
@@ -190,11 +198,11 @@ public class ExperimentRunner {
 							sim.setStringNum(simNum);
 							
 							sim.runSimulation();
-							long endTime = System.currentTimeMillis()/1000;
-							long timeOfLastRun = endTime - startTime;
+//							long endTime = System.currentTimeMillis()/1000;
+//							long timeOfLastRun = endTime - startTime;
 							
-							double simsLeft = numSimsTotal-numSim;
-							System.out.println(simNum + " complete, progress = " + 100*numSim/numSimsTotal + "%, estimated time remaning: " + timeOfLastRun*simsLeft/60 + " minutes");
+//							double simsLeft = numSimsTotal-numSim;
+//							System.out.println(simNum + " complete, progress = " + 100*numSim/numSimsTotal + "%, estimated time remaning: " + timeOfLastRun*simsLeft/60 + " minutes");
 							
 							sim.writeExperimentToCSV(csvWriter, strats, incrementCSVoutput, n);
 							
@@ -204,10 +212,12 @@ public class ExperimentRunner {
 			}
 		}
 		
-		System.out.println("Data successfully written to " + experimentName + ".csv");
+//		System.out.println("Data successfully written to " + experimentName + ".csv");
 		
 		//cleanup
 		csvWriter.flush();
         csvWriter.close();
+
+		System.out.println(configPath+" done!");
 	}
 }
