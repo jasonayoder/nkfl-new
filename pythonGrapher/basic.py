@@ -57,6 +57,17 @@ for map in comparisonFitnesses:
             for i in value:
                 compRe[key].append([i])
 
+finalGens = [[]]
+for runVals in generationFitnesses:
+    if(len(runVals)>0):
+        maxGen = max(runVals.keys())
+        maxGen = runVals[maxGen]
+        for step in range(len(maxGen)):
+            if step < len(finalGens):
+                finalGens[step].append(maxGen[step])
+            else:
+                finalGens.append([maxGen[step]])
+
 for key, value in compRe.items():
     mean = []
     low = []
@@ -67,8 +78,18 @@ for key, value in compRe.items():
         high.append(np.mean(i) + (np.std(i)/np.sqrt(len(value))))
     plt.plot(range(len(mean)), mean,label=key)
     plt.fill_between(range(len(mean)), low, high, alpha=.25)
+
+mean = []
+low = []
+high = []
+for i in finalGens:
+    mean.append(np.mean(i))
+    low.append(np.mean(i) - (np.std(i)/np.sqrt(len(value))))
+    high.append(np.mean(i) + (np.std(i)/np.sqrt(len(value))))
+plt.plot(range(len(mean)), mean,label="Final Generation")
+plt.fill_between(range(len(mean)), low, high, alpha=.25)
+
 plt.legend()
 plt.xlabel("steps") 
 plt.ylabel("average fitness")
 plt.show()
-print("done")
