@@ -18,7 +18,7 @@ public class ExperimentRunner {
 	public static void run(String configPath) {
 		
 		PropParser.load(configPath);
-		
+
 //		//Strategy Parameters
 		int strategyLength = Integer.parseInt(PropParser.getProperty("strategyLength"));
 		int sensitivity = Integer.parseInt(PropParser.getProperty("sensitivity"));
@@ -51,7 +51,8 @@ public class ExperimentRunner {
 
 		//Data Reporting Parameters
 		int incrementCSVoutput = Integer.parseInt(PropParser.getProperty("incrementCSVoutput"));
-		String experimentName = "Config_Experiment_" + seed + "_" + selectionType + "k=" + k;
+		//String experimentName = "Config_Experiment_" + seed + "_" + selectionType + "k=" + k;
+		String experimentName = PropParser.getProperty("filename");
 		PrintWriter csvWriter;
 		File csvFile = new File(experimentName);
 
