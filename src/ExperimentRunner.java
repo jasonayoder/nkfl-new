@@ -12,7 +12,7 @@ public class ExperimentRunner {
 	
 	
 	public static void main(String[] args) {
-		String filename = "src/config.properties";
+		String filename = "configFiles/config.properties";
 		run(filename);
 	}
 	public static void run(String configPath) {
