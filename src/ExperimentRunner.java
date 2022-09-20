@@ -56,7 +56,8 @@ public class ExperimentRunner implements Runnable{
 
 		//Data Reporting Parameters
 		int incrementCSVoutput = Integer.parseInt(PropParser.getProperty("incrementCSVoutput"));
-		String experimentName = "Config_Experiment_" + seed + "_" + selectionType + "k=" + k;
+		//String experimentName = "Config_Experiment_" + seed + "_" + selectionType + "k=" + k;
+		String experimentName = PropParser.getProperty("filename");
 		PrintWriter csvWriter;
 		File csvFile = new File(experimentName);
 
