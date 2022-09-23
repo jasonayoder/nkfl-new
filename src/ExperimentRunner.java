@@ -51,8 +51,12 @@ public class ExperimentRunner {
 
 		//Data Reporting Parameters
 		int incrementCSVoutput = Integer.parseInt(PropParser.getProperty("incrementCSVoutput"));
-		//String experimentName = "Config_Experiment_" + seed + "_" + selectionType + "k=" + k;
 		String experimentName = PropParser.getProperty("filename");
+		if(experimentName == null) {
+			experimentName = "Config_Experiment_" + seed + "_" + selectionType + "k=" + k;
+		}
+		
+		System.out.println(experimentName);
 		PrintWriter csvWriter;
 		File csvFile = new File(experimentName);
 
