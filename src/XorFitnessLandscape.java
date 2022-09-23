@@ -2,22 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
-public class XorFitnessLandscape extends FitnessLandscape{
-	
-	public static void main(String[] args) throws FileNotFoundException {
-		XorFitnessLandscape xor = new XorFitnessLandscape(15,10,.1,0);
-		PrintWriter writer = new PrintWriter (new File("fitnessOverCycles.csv"));
-		for(int i = 0; i<100; i++) {
-			writer.print(xor.fitness(0));
-			for(int g = 1; g<1<<15;g++) {
-				writer.print(","+xor.fitness(g));
-			}
-			writer.println();
-			xor.nextCycle();
-		}
-		writer.flush();
-		writer.close();
-	}
+public class XorFitnessLandscape extends DynamicFitnessLandscape{
 	
 	
 	int m = 0;
