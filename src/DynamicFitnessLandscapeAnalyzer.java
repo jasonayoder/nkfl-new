@@ -4,8 +4,8 @@ import java.io.PrintWriter;
 
 public class DynamicFitnessLandscapeAnalyzer {
 	public static void main(String[] args) throws FileNotFoundException {
-//		DFLfitOverTime(new XorFitnessLandscape(15,10,.1,0),"fitnessOverCyclesXor.csv");
-		DFLfitOverTime(new LERPFitnessLandscape(15,10,100,0),"fitnessOverCyclesLERP.csv");
+		DFLfitOverTime(new XorFitnessLandscape(15,10,.1,0),"fitnessOverCyclesXor.csv");
+//		DFLfitOverTime(new LERPFitnessLandscape(15,10,100,0),"fitnessOverCyclesLERP.csv");
 	}
 	
 	public static void DFLfitOverTime(DynamicFitnessLandscape DFL, String filename) throws FileNotFoundException {

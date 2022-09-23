@@ -5,24 +5,25 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LogNorm
 
-
+# rng = np.random.default_rng(19680801)
 filename = askopenfilename()
-fig,axes = plt.subplots()
+fig,axes = plt.subplots(3)
 data = []
-cycle = []
-e = 0
+n_bins = 200
 with open(filename) as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
-        for i in range(len(row)):
-            cycle.append(e)
-            data.append(float(row[i]))
-        e+=1
-cmap = copy(plt.cm.plasma)
-cmap.set_bad(cmap(0))
-h, xedges, yedges = np.histogram2d(cycle, data,bins=100)
-pcm = axes.pcolormesh(xedges, yedges, h.T,norm=LogNorm(), cmap=cmap,rasterized=True)#
-fig.colorbar(pcm, ax=axes, label="# points", pad=0)
-axes.set_title("2d histogram and log color scale")
+        data.append([])
+        for col in row:
+            data[-1].append(float(col))
+
+# dist1 = rng.standard_normal(30000)
+# axes[0].hist(dist1)
+axes[0].hist(data[0],bins=n_bins)
+axes[0].set_yscale('log')
+axes[1].hist(data[int(len(data)/2)],bins=n_bins)
+axes[1].set_yscale('log')
+axes[2].hist(data[-1],bins=n_bins)
+axes[2].set_yscale('log')
 
 plt.show()
