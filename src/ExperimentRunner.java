@@ -11,6 +11,8 @@ import config.PropParser;
 public class ExperimentRunner implements Runnable{
 	
 	String configPath = "src/config.properties";
+	double nextThreshold = .1;
+	
 	public static void main(String[] args) {
 		ExperimentRunner runner = new ExperimentRunner();
 		runner.run();
@@ -202,7 +204,11 @@ public class ExperimentRunner implements Runnable{
 //							long endTime = System.currentTimeMillis()/1000;
 //							long timeOfLastRun = endTime - startTime;
 							
-//							double simsLeft = numSimsTotal-numSim;
+							double percent = (numSim)/numSimsTotal;
+							if(percent>nextThreshold) {
+								System.out.println(configPath+": "+(int)(percent*100)+"%");
+								nextThreshold += .1;
+							}
 //							System.out.println(simNum + " complete, progress = " + 100*numSim/numSimsTotal + "%, estimated time remaning: " + timeOfLastRun*simsLeft/60 + " minutes");
 							
 							sim.writeExperimentToCSV(csvWriter, strats, incrementCSVoutput, n);

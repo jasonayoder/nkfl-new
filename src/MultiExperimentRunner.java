@@ -17,9 +17,9 @@ public class MultiExperimentRunner {
 				File f = new File(args[i]);
 				getFiles(f,configs);
 			}
-			while(!configs.isEmpty()) {
-				configs.poll().run();
-			}
+//			while(!configs.isEmpty()) {
+//				configs.poll().run();
+//			}
 			run(configs);
 		}
 	}
