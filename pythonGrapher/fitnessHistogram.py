@@ -26,4 +26,10 @@ axes[1].set_yscale('log')
 axes[2].hist(data[-1],bins=n_bins)
 axes[2].set_yscale('log')
 
+print("mean, standard deviation")
+print(np.mean(data[0]),np.std(data[0]))
+print(np.mean(data[-1]),np.std(data[-1]))
+
+
+
 plt.show()
