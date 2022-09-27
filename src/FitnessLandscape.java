@@ -152,9 +152,14 @@ public class FitnessLandscape {
 	 */
 	public double maxFit() {
 		double maxFit = 0.0;
-		for (int x = 0; x < fitTable.length; x++) {
-			if (fitTable[x] > maxFit) {
-				maxFit = fitTable[x];
+//		for (int x = 0; x < fitTable.length; x++) {
+//			if (fitTable[x] > maxFit) {
+//				maxFit = fitTable[x];
+//			}
+//		}
+		for(int g =0; g<1<<n; g++) {
+			if(this.fitness(g)>maxFit) {
+				maxFit = this.fitness(g);
 			}
 		}
 		return maxFit;
@@ -166,9 +171,14 @@ public class FitnessLandscape {
 	 */
 	public double minFit() {
 		double minFit = 0.0;
-		for (int x = 0; x < fitTable.length; x++) {
-			if (fitTable[x] < minFit) {
-				minFit = fitTable[x];
+//		for (int x = 0; x < fitTable.length; x++) {
+//			if (fitTable[x] < minFit) {
+//				minFit = fitTable[x];
+//			}
+//		}
+		for(int g =0; g<1<<n; g++) {
+			if(this.fitness(g)<minFit) {
+				minFit = this.fitness(g);
 			}
 		}
 		return minFit;

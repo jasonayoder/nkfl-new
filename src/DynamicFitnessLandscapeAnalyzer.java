@@ -11,13 +11,14 @@ public class DynamicFitnessLandscapeAnalyzer {
 	public static void main(String[] args) throws IOException {
 //		DFLfitOverTime(new XorFitnessLandscape(15,10,.1,0),"fitnessOverCyclesXor.csv");
 //		DFLfitOverTime(new LERPFitnessLandscape(15,10,100,0),"fitnessOverCyclesLERP.csv");
+		DFLfitOverTime(new DERPFitnessLandscape(15,10,100,0),"fitnessOverCyclesDERP.csv");
 //		DFLfitOverTime(new PLTFitnessLandscape(15,10,.1,0),"fitnessOverCyclesPLT.csv");
 //		DFLfitOverTime(new CopyFitnessLandscape(15,10,.2,0),"fitnessOverCyclesCopy.csv");
 //		DFLfitOverTime(new TempPermFitnessLandscape(15,10,5,3,0),"fitnessOverCyclesTempPerm.csv");
 //		DFLfitOverTime(new SingleTempFitnessLandscape(15,10,1,0),"fitnessOverCyclesSingleTemp.csv");
 //		DFLfitOverTime(new SumTempFitnessLandscape(15,10,5,3,.1,0),"fitnessOverCyclesSumTemp.csv");	
 //		DFLLocalMaximaOverTime(new XorFitnessLandscape(15,10,.1,0),"LocalMaximaOverCyclesXor.csv");
-		DFLLocalMaximaOverTime(new LERPFitnessLandscape(15,10,100,0),"LocalOverCyclesLERP.csv");
+//		DFLLocalMaximaOverTime(new LERPFitnessLandscape(15,10,100,0),"LocalOverCyclesLERP.csv");
 	}
 	
 	public static void DFLfitOverTime(DynamicFitnessLandscape DFL, String filename) throws IOException {
