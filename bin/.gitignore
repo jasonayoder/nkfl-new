@@ -11,3 +11,5 @@
 /SumTempFitnessLandscape.class
 /XorFitnessLandscape.class
 /DERPFitnessLandscape.class
+/FitnessLandscapeFactory.class
+/NonDynamicFitnessLandscape.class

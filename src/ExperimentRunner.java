@@ -56,6 +56,15 @@ public class ExperimentRunner {
 			experimentName = "Config_Experiment_" + seed + "_" + selectionType + "k=" + k;
 		}
 		
+		String landscapeName = PropParser.getProperty("landscapeName");
+		String landscapeParams = PropParser.getProperty("landscapeParams");
+		int tau = Integer.MAX_VALUE;
+		try{
+			tau = Integer.parseInt(PropParser.getProperty("generationsPerCycle"));
+		}catch(NumberFormatException e) {
+			System.out.println("generationsPerCycle not provided continuing with SOP");
+		}
+		
 		System.out.println(experimentName);
 		PrintWriter csvWriter;
 		File csvFile = new File(experimentName);
@@ -164,7 +173,7 @@ public class ExperimentRunner {
 				LookStep.DEFAULT_NUM_CHECKS = sense;
 				for(int simulation = 0; simulation < simulations; simulation++)
 				{
-					FitnessLandscape landscape = new FitnessLandscape(n, thisk, SeededRandom.rnd.nextInt());
+					DynamicFitnessLandscape landscape = FitnessLandscapeFactory.getLandscape(n,thisk,SeededRandom.rnd.nextInt(),landscapeName,landscapeParams);//new FitnessLandscape(n, thisk, SeededRandom.rnd.nextInt());
 					for(int start = 0; start < starts; start++)
 					{
 						int startingLocation = FitnessLandscape.gen2ind((NDArrayManager.array1dRandInt(n, 2)));
@@ -193,7 +202,8 @@ public class ExperimentRunner {
 									childrenPercentage,
 									startingLocation,
 									selectionType,
-									strategyRuns
+									strategyRuns,
+									tau
 									);
 							sim.setStringNum(simNum);
 							

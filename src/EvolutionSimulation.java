@@ -16,16 +16,17 @@ public class EvolutionSimulation {
 	double mutationPercentage; //% mutation rate
 	int strategyLength;
 	int startingLocation;
-	FitnessLandscape landscape;
+	DynamicFitnessLandscape landscape;
 	String simNum = "N/A";
 	String evolutionType = "N/A";
 	int strategyRuns;
+	int tau;
 	
 	//Instance variables
 	public ArrayList<StrategyGeneration> generations = new ArrayList<StrategyGeneration>();
 	//generations ArrayList contains which step we are on
 	
-	public EvolutionSimulation(FitnessLandscape landscape, int popsPerGeneration, int numGenerations, double mutationPercentage, int strategyLength, double percentNewPerGeneration, int startingLocation, String evolutionType, int strategyRuns)
+	public EvolutionSimulation(DynamicFitnessLandscape landscape, int popsPerGeneration, int numGenerations, double mutationPercentage, int strategyLength, double percentNewPerGeneration, int startingLocation, String evolutionType, int strategyRuns,int tau)
 	{
 		this.landscape = landscape;
 		this.popsPerGeneration = popsPerGeneration;
@@ -36,6 +37,7 @@ public class EvolutionSimulation {
 		this.startingLocation = startingLocation;
 		this.evolutionType = evolutionType;
 		this.strategyRuns = strategyRuns;
+		this.tau = tau;
 		setupSimulation();
 	}
 
@@ -89,6 +91,9 @@ public class EvolutionSimulation {
 			nextGen.runAllStrategies(strategyRuns);
 //			System.out.println("Completed Generation " + i);
 //			System.out.println(nextGen.averageFitness());
+			if(i%tau==0) {
+				landscape.nextCycle();
+			}
 		}
 //		writeExperimentToCSV();
 	}

@@ -4,7 +4,7 @@ public class CopyFitnessLandscape extends DynamicFitnessLandscape{
 	int[] B;
 	public CopyFitnessLandscape (int n, int k, double r, int seed) {
 		super(n, k, seed);
-		this.r = (int)(r*n);
+		this.r = (int)(r*(1<<n));
 		B = new int[1<<n];
 		for(int i = 0; i<B.length;i++) {
 			B[i] = i;
