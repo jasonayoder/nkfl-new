@@ -24,5 +24,7 @@ h, xedges, yedges = np.histogram2d(cycle, data,bins=100)
 pcm = axes.pcolormesh(xedges, yedges, h.T,norm=LogNorm(), cmap=cmap,rasterized=True)#
 fig.colorbar(pcm, ax=axes, label="# points", pad=0)
 axes.set_title("2d histogram and log color scale")
-
+plt.xlabel("Cycle")
+plt.title("frequency of fitness values over time")
+plt.ylabel("Fitness")
 plt.show()
