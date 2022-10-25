@@ -118,7 +118,7 @@ public class EvolutionSimulation {
 	static final String FitnessRowHeader = "FITNESS_ROW";
 	static final String ComparisonStrategyHeader = "COMPARISON_STRATEGIES";
 	static final int numTestsForComparison = 1000;
-	public void writeExperimentToCSV(PrintWriter csvWriter, Map<String, ArrayList<Step>> comparisonStrategies, int csvIncrement, int n)
+	public void writeExperimentToCSV(PrintWriter csvWriter, int csvIncrement, int n)
 	{
 		csvWriter.print(SimulationHeader + "," + simNum + "," + "Sensitivity: " + LookStep.DEFAULT_NUM_CHECKS  + "," + "Landscape seed: " + landscape.landscapeSeed + "," + "Starting Location" + NDArrayManager.array1dAsString(FitnessLandscape.ind2gen(startingLocation,n)) + "," + "K Value:" + landscape.k + "\n");
 		for(int gen = 0; gen < generations.size(); gen += csvIncrement)
@@ -143,27 +143,27 @@ public class EvolutionSimulation {
 			csvWriter.print("\n");
 			
 		}
-		
-		csvWriter.print(ComparisonStrategyHeader);
-		for(String name : comparisonStrategies.keySet())
-		{
-			StrategyGeneration tested = landscape.testStrategyOnLandscape(comparisonStrategies.get(name), numTestsForComparison, startingLocation);
-//			System.out.println(name + ", " + tested.getBestStrategyOfGeneration().strategy);
-			
-			csvWriter.print("\n" + name);
-			csvWriter.print("\n" + StrategyRowHeader);
-			for(Step s : comparisonStrategies.get(name))
-			{
-				csvWriter.print("," + s.getStepName());
-			}
-			csvWriter.print("\n");
-			csvWriter.print(FitnessRowHeader);
-			for(double d: tested.getAverageFitnessAtSteps())
-			{
-				csvWriter.print("," + d);
-			}
-		}
-		csvWriter.print("\n");
+//		
+//		csvWriter.print(ComparisonStrategyHeader);
+//		for(String name : comparisonStrategies.keySet())
+//		{
+//			StrategyGeneration tested = landscape.testStrategyOnLandscape(comparisonStrategies.get(name), numTestsForComparison, startingLocation);
+////			System.out.println(name + ", " + tested.getBestStrategyOfGeneration().strategy);
+//			
+//			csvWriter.print("\n" + name);
+//			csvWriter.print("\n" + StrategyRowHeader);
+//			for(Step s : comparisonStrategies.get(name))
+//			{
+//				csvWriter.print("," + s.getStepName());
+//			}
+//			csvWriter.print("\n");
+//			csvWriter.print(FitnessRowHeader);
+//			for(double d: tested.getAverageFitnessAtSteps())
+//			{
+//				csvWriter.print("," + d);
+//			}
+//		}
+//		csvWriter.print("\n");
 	}
 
 

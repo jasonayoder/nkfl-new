@@ -230,7 +230,7 @@ public class ExperimentRunner {
 							double simsLeft = numSimsTotal-numSim;
 							System.out.println(simNum + " complete, progress = " + 100*numSim/numSimsTotal + "%, estimated time remaning: " + timeOfLastRun*simsLeft/60 + " minutes");
 							
-							sim.writeExperimentToCSV(csvWriter, strats, incrementCSVoutput, n);
+							sim.writeExperimentToCSV(csvWriter, incrementCSVoutput, n);
 							
 						}
 					}

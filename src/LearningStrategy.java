@@ -73,6 +73,11 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		{
 			this.strategy.add(s);
 		}
+		
+		if(!randomStrategy)
+		{
+			strategy = setStrategy;
+		}
 
 		initializeArrays(genotype);
 	}
@@ -147,18 +152,21 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	}
 	
 	private void enforceNumberOfWalks() {
-		int walks = getNumberOfWalks();
-		int diff = setNumberOfWalks - walks;
-		
-		while(diff < 0)//too many walks
+		if(setNumberOfWalks != 0 && !ignoreWalkNumber)
 		{
-			turnRandomStepToLook();
-			diff++;
+			int walks = getNumberOfWalks();
+			int diff = setNumberOfWalks - walks;
+			
+			while(diff < 0)//too many walks
+			{
+				turnRandomStepToLook();
+				diff++;
+			}
+			while(diff > 0)//too few walks
+			{
+				turnRandomStepToWalk();
+				diff--;
 		}
-		while(diff > 0)//too few walks
-		{
-			turnRandomStepToWalk();
-			diff--;
 		}
 	}
 	
