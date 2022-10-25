@@ -71,7 +71,7 @@ for key,value in genFitRearrange.items():
         vals.append(v)
     mean.append(np.mean(vals))
     low.append(np.mean(vals) - (np.std(vals)/np.sqrt(len(vals))))
-    high.append(np.mean(vals) - (np.std(vals)/np.sqrt(len(vals))))
+    high.append(np.mean(vals) + (np.std(vals)/np.sqrt(len(vals))))
     # mean.append(np.mean(i))
     # low.append(np.mean(i) - (np.std(i)/np.sqrt(len(value))))
     # high.append(np.mean(i) + (np.std(i)/np.sqrt(len(value))))

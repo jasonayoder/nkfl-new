@@ -49,4 +49,9 @@ public class WalkStep extends Step {
 		return "Walk";
 	}
 
+	@Override
+	public boolean equals(Step o) {
+		return (o instanceof WalkStep);
+	}
+
 }

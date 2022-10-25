@@ -39,4 +39,9 @@ public class LookStep extends Step {
 		return "Look";
 	}
 
+	@Override
+	public boolean equals(Step o) {
+		return (o instanceof LookStep);
+	}
+
 }

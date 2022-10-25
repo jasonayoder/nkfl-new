@@ -298,7 +298,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 				this.mutateStep(i);
 			}
 		}
-		if(!ignoreWalkNumber)
+		if(setNumberOfWalks!= 0 && !ignoreWalkNumber)
 		{
 			enforceNumberOfWalks();
 		}
@@ -307,7 +307,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	public int hammingDistance(LearningStrategy ls) {
 		int ham = 0;
 		for(int i = 0; i<strategy.size(); i++) {
-			if(!strategy.get(i).toString().equals(ls.strategy.get(i).toString())) {
+			if(this.strategy.get(i).equals(ls.strategy.get(i))) {
 				ham++;
 			}
 		}

@@ -10,4 +10,5 @@ public abstract class Step {
 	public Step() {
 	}
 	public abstract String getStepName();
+	public abstract boolean equals(Step o);
 }

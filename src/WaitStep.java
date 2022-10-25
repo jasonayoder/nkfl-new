@@ -12,4 +12,9 @@ public class WaitStep extends Step {
 	public String getStepName() {
 		return "Wait";
 	}
+
+	@Override
+	public boolean equals(Step o) {
+		return (o instanceof WaitStep);
+	}
 }
