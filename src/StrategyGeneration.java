@@ -41,6 +41,18 @@ public class StrategyGeneration {
 		}
 	}
 	
+	public StrategyGeneration(FitnessLandscape landscape, int numStrategies, int strategyLength)
+	{
+		this.landscape = landscape;
+		this.strategyLength = strategyLength;
+//		this.startingLocation = ;
+		
+		for(int i = 0; i < numStrategies; i++)
+		{
+			strategies.add(new LearningStrategy(landscape, strategyLength));
+		}
+	}
+	
 	/**
 	 * Declares a strategy generation from an arraylist of strategies
 	 * 

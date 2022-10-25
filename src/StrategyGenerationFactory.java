@@ -58,6 +58,45 @@ public class StrategyGenerationFactory {
 		return childGeneration;
 	}
 	
+	public static StrategyGeneration generateRanked(StrategyGeneration parents, int numChildren, double mutationRate) {
+		ArrayList<LearningStrategy> childrenStrategies = new ArrayList<LearningStrategy>();
+		parents.sortStrategies();
+		
+		for(int i = 0; i < numChildren; i++)
+		{
+			LearningStrategy child = getParentRanked(parents, 2).getMutatedChild(mutationRate);
+			childrenStrategies.add(child);
+		}
+		//Best parents get direct descendants in the new gen
+		//Best parents at end of array so we go backwards
+		for(int i = numChildren; i < parents.getNumStrategies(); i++)
+		{
+			LearningStrategy survivor = parents.getDirectChild(i);
+			childrenStrategies.add(survivor);
+		}
+		return new StrategyGeneration(childrenStrategies);
+	}
+	
+	public static LearningStrategy getParentRanked(StrategyGeneration parents, int rankingFactor)
+	{
+		ArrayList<LearningStrategy> parentCantidates = new ArrayList<LearningStrategy>();
+		
+		for(int i=0; i<rankingFactor; i++)
+		{
+			parentCantidates.add(parents.getStrategyAtIndex(SeededRandom.rnd.nextInt(parents.getNumStrategies())));
+		}
+		
+		LearningStrategy bestParent = parentCantidates.get(0);
+		for(LearningStrategy parent : parentCantidates)
+		{
+			if(bestParent.getFinalFitness() < parent.getFinalFitness())
+			{
+				bestParent = parent;
+			}
+		}
+		return bestParent;
+	}
+	
 	private static LearningStrategy truncateParents(LearningStrategy p1, LearningStrategy p2, int truncateIndex)
 	{
 		int stratLength = p1.getStrategyLength();

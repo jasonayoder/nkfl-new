@@ -44,7 +44,7 @@ currSHC = []
 currAlternate = []
 currBalance = []
 
-topGen = '50'
+topGen = '100'
 
 toSkip = 0 #skip lines
 #parse the CSV file

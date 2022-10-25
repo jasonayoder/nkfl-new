@@ -29,10 +29,12 @@ public class ExperimentRunner {
 		int numberOfWalks = Integer.parseInt(PropParser.getProperty("numberOfWalks"));
 		LearningStrategy.setNumberOfWalks = numberOfWalks;
 		LearningStrategy.usingWait = Boolean.parseBoolean(PropParser.getProperty("usingWait"));
+		LearningStrategy.evolveGenotype = Boolean.parseBoolean(PropParser.getProperty("evolveGenotype"));
+		LearningStrategy.randomStart = Boolean.parseBoolean(PropParser.getProperty("randomStart"));
+		LearningStrategy.evolveStrategy = Boolean.parseBoolean(PropParser.getProperty("evolveStrategy"));
 
 		//Landscape Parameters
 		int n = Integer.parseInt(PropParser.getProperty("n"));
-		int setk = Integer.parseInt(PropParser.getProperty("setk"));
 		int k = Integer.parseInt(PropParser.getProperty("k"));
 		int maxk = Integer.parseInt(PropParser.getProperty("maxk")); //Set this equal to k for a single k run
 		int kincrement = Integer.parseInt(PropParser.getProperty("kincrement"));
@@ -102,15 +104,6 @@ public class ExperimentRunner {
 			pureWalk.add(new WalkStep());
 		}
 		strats.put("PureWalk", pureWalk);
-		
-//		ArrayList<Step> alternateLookWalk = new ArrayList<Step>();
-//		for(int i = 0; i < strategyLength/2; i++)
-//		{
-//			alternateLookWalk.add(new LookStep());
-//			alternateLookWalk.add(new WalkStep());
-//		}
-//		strats.put("AlternateLookWalk", alternateLookWalk);
-//		
 		//New, smarter alternate
 		ArrayList<Step> alternateLookWalk = new ArrayList<Step>();
 		int looksperwalka = (int) Math.floor((n * 1.0/sensitivity));
@@ -162,8 +155,31 @@ public class ExperimentRunner {
 			strats.put("Balanced", balanced);
 		}
 		
+		String startingStrategy = PropParser.getProperty("startingStrategy");
+		if(startingStrategy.equals("PureWalk"))
+		{
+			LearningStrategy.randomStrategy = false;
+			LearningStrategy.setStrategy = strats.get(startingStrategy);
+		}
+		else if(startingStrategy.equals("AlternateLookWalk"))
+		{
+			LearningStrategy.randomStrategy = false;
+			LearningStrategy.setStrategy = strats.get(startingStrategy);
+		}
+		else if(startingStrategy.equals("Steep Hill Climb"))
+		{
+			LearningStrategy.randomStrategy = false;
+			LearningStrategy.setStrategy = strats.get(startingStrategy);
+		}
+		else if(startingStrategy.equals("Balanced"))
+		{
+			LearningStrategy.randomStrategy = false;
+			LearningStrategy.setStrategy = strats.get(startingStrategy);
+		}
+		
 		double numSimsTotal = (((maxk-k)/kincrement)+1) * (((maxSensitivity-sensitivity)/sensitivityInceremet)+1) * simulations * starts * runs;
 		double numSim = 0;
+		
 		
 		//Run Simulation
 		for(int thisk = k; thisk <= maxk; thisk+=kincrement)

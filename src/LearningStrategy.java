@@ -24,6 +24,12 @@ import java.util.ArrayList;
  */
 public class LearningStrategy implements Comparable<LearningStrategy>{
 	static int setNumberOfWalks = 0;
+	public static boolean evolveGenotype = false;
+	public static boolean evolveStrategy = false;
+	public static boolean randomStart = false;
+	
+	public static boolean randomStrategy = true;
+	public static ArrayList<Step> setStrategy = null;
 	//Data needed to function
 	ArrayList<Step> strategy;
 	ArrayList<Integer> lookedLocations = new ArrayList<Integer>();
@@ -83,16 +89,47 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		
 		strategy = new ArrayList<Step>();
 		
-		for(int i = 0; i < strategyLength; i++)
+		if(randomStrategy)
 		{
-			strategy.add(this.getRandomStep());
+			for(int i = 0; i < strategyLength; i++)
+			{
+				strategy.add(this.getRandomStep());
+			}
+		}
+		else
+		{
+			strategy = setStrategy;
 		}
 		
 		initializeArrays(genotype);
 	}
 	
+	public LearningStrategy(FitnessLandscape landscape, int strategyLength) {
+		this.landscape = landscape;
+		
+		
+		strategy = new ArrayList<Step>();
+		
+		if(randomStrategy)
+		{
+			for(int i = 0; i < strategyLength; i++)
+			{
+				strategy.add(this.getRandomStep());
+			}
+		}
+		else
+		{
+			strategy = setStrategy;
+		}
+		
+		int thisGenotype = SeededRandom.rnd.nextInt((int)Math.pow(2, landscape.n));
+		initializeArrays(thisGenotype);
+	}
+	
+	public static boolean out = false;
 	private void initializeArrays(int genotype)
 	{
+		
 		this.phenotype = genotype;
 		this.phenotypeFitness = landscape.fitness(genotype);
 
@@ -285,12 +322,46 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	}
 	
 	public void mutate(double mutationPercentage) {
-		for(int i = 0; i < strategy.size(); i++)
+		if(evolveStrategy)
 		{
-			double roll = SeededRandom.rnd.nextDouble() * 100;
-			if(roll < mutationPercentage)
+			for(int i = 0; i < strategy.size(); i++)
 			{
-				this.mutateStep(i);
+				double roll = SeededRandom.rnd.nextDouble() * 100;
+				if(roll < mutationPercentage)
+				{
+					this.mutateStep(i);
+				}
+			}
+		}
+		//mutate the genotype if we have to
+		if(evolveGenotype)
+		{
+			int genotypeTracker = genotype;
+			for(int i=landscape.n-1; i>=0; i--)
+			{
+				double roll = SeededRandom.rnd.nextDouble();
+				if(roll < mutationPercentage)
+				{
+					if(genotypeTracker >= Math.pow(2, i))
+					{
+						genotype-=Math.pow(2, i);
+					}
+					else
+					{
+						genotype+=Math.pow(2, i);
+					}
+				}
+				if(genotypeTracker >= Math.pow(2, i))
+				{
+					genotypeTracker-=Math.pow(2, i);
+				}
+			}
+			genotypeFitness = landscape.fitness(genotype);
+			
+			if(!strategyExecuted)
+			{
+				phenotype = genotype;
+				phenotypeFitness = genotypeFitness;
 			}
 		}
 		if(!ignoreWalkNumber)
@@ -366,6 +437,10 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 			stepIndex = SeededRandom.rnd.nextInt(strategy.size());
 		}
 		strategy.set(stepIndex, new WalkStep());
+	}
+	
+	public double getFinalFitness() {
+		return getFitnessAtStep(fitnessArray.length-1);
 	}
 	
 	public double getFitnessAtStep(int step) {

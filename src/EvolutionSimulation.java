@@ -53,7 +53,15 @@ public class EvolutionSimulation {
 	
 	public void setupSimulation()
 	{
-		StrategyGeneration gen0 = new StrategyGeneration(landscape, popsPerGeneration, strategyLength, startingLocation);
+		StrategyGeneration gen0;
+		if(!LearningStrategy.randomStart)
+		{
+			gen0 = new StrategyGeneration(landscape, popsPerGeneration, strategyLength, startingLocation);
+		}
+		else
+		{
+			gen0 = new StrategyGeneration(landscape, popsPerGeneration, strategyLength);
+		}
 		generations.add(gen0);
 		gen0.runAllStrategies(strategyRuns);
 	}
@@ -73,6 +81,10 @@ public class EvolutionSimulation {
 			{
 				nextGen = StrategyGenerationFactory.generateTruncation(generations.get(generations.size() - 1), childrenPerGeneration, mutationPercentage);
 			}
+			else if(evolutionType.toLowerCase().equals("ranked"))
+			{
+				nextGen = StrategyGenerationFactory.generateRanked(generations.get(generations.size() - 1), childrenPerGeneration, mutationPercentage);
+			}
 //			else if(evolutionType.toLowerCase().equals("ranked_linear"))
 //			{
 //				nextGen = StrategyGenerationFactory.generateRankedLinear(generations.get(generations.size() - 1), childrenPerGeneration, startingLocation);
@@ -89,6 +101,7 @@ public class EvolutionSimulation {
 			generations.add(nextGen);
 			//Run the next generation
 			nextGen.runAllStrategies(strategyRuns);
+//			System.out.println("GOB:"+nextGen.getBestStrategyOfGeneration().genotype);
 //			System.out.println("Completed Generation " + i);
 //			System.out.println(nextGen.averageFitness());
 			if(i%tau==0) {
@@ -110,7 +123,7 @@ public class EvolutionSimulation {
 		csvWriter.print(SimulationHeader + "," + simNum + "," + "Sensitivity: " + LookStep.DEFAULT_NUM_CHECKS  + "," + "Landscape seed: " + landscape.landscapeSeed + "," + "Starting Location" + NDArrayManager.array1dAsString(FitnessLandscape.ind2gen(startingLocation,n)) + "," + "K Value:" + landscape.k + "\n");
 		for(int gen = 0; gen < generations.size(); gen += csvIncrement)
 		{
-			csvWriter.print(GenerationHeader + "," + gen + "\n");
+			csvWriter.print(GenerationHeader + "," + gen + "," + "GENOTYPE_OF_BEST" + generations.get(gen).getBestStrategyOfGeneration().genotype + "\n");
 			
 			//Write strategy to CSV
 			csvWriter.print(StrategyRowHeader);
