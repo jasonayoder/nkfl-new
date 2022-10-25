@@ -32,7 +32,6 @@ public class ExperimentRunner {
 
 		//Landscape Parameters
 		int n = Integer.parseInt(PropParser.getProperty("n"));
-		int setk = Integer.parseInt(PropParser.getProperty("setk"));
 		int k = Integer.parseInt(PropParser.getProperty("k"));
 		int maxk = Integer.parseInt(PropParser.getProperty("maxk")); //Set this equal to k for a single k run
 		int kincrement = Integer.parseInt(PropParser.getProperty("kincrement"));

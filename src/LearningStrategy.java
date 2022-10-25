@@ -28,6 +28,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	ArrayList<Step> strategy;
 	ArrayList<Integer> lookedLocations = new ArrayList<Integer>();
 	public double[] fitnessArray; //fitnesses at each step
+	public int[] phenotypeArray;
 	public FitnessLandscape landscape; // This LearningStrategy's NKFL
 	public static boolean usingWait = false;
 	
@@ -102,6 +103,8 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		//Set our original values
 		fitnessArray = new double[strategy.size()];
 		fitnessArray[0] = this.genotypeFitness;
+		phenotypeArray = new int[strategy.size()];
+		phenotypeArray[0] = this.phenotype;
 		
 		if(setNumberOfWalks != 0 && !ignoreWalkNumber)
 		{
@@ -184,6 +187,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 				this.phenotypeFitness = landscape.fitness(phenotype);
 				
 				fitnessArray[i] = this.phenotypeFitness;
+				phenotypeArray[i] = this.phenotype;
 			}
 			strategyExecuted = true;
 			return this.phenotypeFitness;
@@ -209,6 +213,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 					this.phenotype = current.execute(landscape, phenotype, lookedLocations);
 					this.phenotypeFitness = landscape.fitness(phenotype);
 					fitnessArray[i] = this.phenotypeFitness;
+					phenotypeArray[i] = this.phenotype;
 				}
 				
 				for(int i = 0; i < fitnessArray.length; i++)
@@ -299,6 +304,16 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		}
 	}
 	
+	public int hammingDistance(LearningStrategy ls) {
+		int ham = 0;
+		for(int i = 0; i<strategy.size(); i++) {
+			if(!strategy.get(i).toString().equals(ls.strategy.get(i).toString())) {
+				ham++;
+			}
+		}
+		return ham;
+	}
+	
 	/**
 	 * Randomly mutates step i of the strategy array
 	 * @param i
@@ -374,6 +389,10 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	
 	public double[] getFitnessArray() {
 		return fitnessArray;
+	}
+	
+	public int[] getPhenotypeArray() {
+		return phenotypeArray;
 	}
 
 	/**

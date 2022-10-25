@@ -102,8 +102,12 @@ public class EvolutionSimulation {
 	static final String SimulationHeader = "SIMULATION";
 	static final String GenerationHeader = "GENERATION";
 	static final String StrategyRowHeader = "STRATEGY_ROW";
+	static final String WalkProbabilityRowHeader = "WALK_PROBABILITY_ROW";
 	static final String FitnessRowHeader = "FITNESS_ROW";
+	static final String HammingDistanceFromBestHeader = "HAMMING_DISTANCE_FROM_BEST";
+	static final String AverageFitnessRowHeader = "AVGFITNESS_ROW";
 	static final String ComparisonStrategyHeader = "COMPARISON_STRATEGIES";
+	static final String HammingDistanceFromMaxRowHeader = "HAMMING_DISTANCE_FROM_PHENOTYPE_TO_BEST";
 	static final int numTestsForComparison = 1000;
 	public void writeExperimentToCSV(PrintWriter csvWriter, Map<String, ArrayList<Step>> comparisonStrategies, int csvIncrement, int n)
 	{
@@ -129,6 +133,51 @@ public class EvolutionSimulation {
 			}
 			csvWriter.print("\n");
 			
+			//Write hamming distance to best
+			csvWriter.print(HammingDistanceFromBestHeader);
+			for(LearningStrategy ls: generations.get(gen).strategies)
+			{
+				csvWriter.print("," + ls.hammingDistance(bestOfGen));
+			}
+			csvWriter.print("\n");
+			
+			//Calculate aggregates
+			double[] probs = new double[strategyLength];
+			double[] avgFitnesses = new double[strategyLength];
+			for(LearningStrategy ls : generations.get(gen).strategies) {
+				for(int i = 0; i<strategyLength; i++) {
+					if(ls.strategy.get(i) instanceof WalkStep) {
+						probs[i]++;
+					}
+					avgFitnesses[i] += ls.fitnessArray[i];
+				}
+			}
+			//Write walk probs
+			csvWriter.print(WalkProbabilityRowHeader);
+			for(int i = 0; i<strategyLength; i++) {
+				csvWriter.print(","+(probs[i]/generations.get(gen).strategies.size()));
+			}
+			csvWriter.print('\n');
+			//Write avg fitnesses
+			csvWriter.print(AverageFitnessRowHeader);
+			for(int i = 0; i<strategyLength; i++) {
+				csvWriter.print(","+(avgFitnesses[i]/generations.get(gen).strategies.size()));
+			}
+			csvWriter.print('\n');
+			//Write distance to max of phenotype
+			csvWriter.write(HammingDistanceFromMaxRowHeader);
+			int max = landscape.maxLoc();
+			for(int phenotype: bestOfGen.getPhenotypeArray()) {
+				int ham = phenotype ^ max;
+				int dist = 0;
+				for(int i = 0; i<landscape.n;i++) {
+					if(0!=(ham&(1<<i))) {
+						dist++;
+					}
+				}
+				csvWriter.print(","+dist);
+			}
+			csvWriter.print('\n');
 		}
 		
 		csvWriter.print(ComparisonStrategyHeader);

@@ -164,6 +164,21 @@ public class FitnessLandscape {
 		}
 		return maxFit;
 	}
+	
+	public int maxLoc() {
+		int max = 0;
+//		for (int x = 0; x < fitTable.length; x++) {
+//			if (fitTable[x] > maxFit) {
+//				maxFit = fitTable[x];
+//			}
+//		}
+		for(int g =0; g<1<<n; g++) {
+			if(this.fitness(g)>this.fitness(max)) {
+				max = g;
+			}
+		}
+		return max;
+	}
 
 	/**
 	 * Brute force method that finds the minimum fitness of the landscape (should be 0 once normalized)
