@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+import landscape.FitnessLandscape;
+
 /*
  * Abstract class of step to make it so we can have various kinds of steps in a learning strategy.
  * 

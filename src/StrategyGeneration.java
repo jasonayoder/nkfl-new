@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import landscape.FitnessLandscape;
+import seededrandom.SeededRandom;
+
 /**
  * The StrategyGeneration class represents a group of
  * learning strategies, and is intended to be used in an evolution simulation

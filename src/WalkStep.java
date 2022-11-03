@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+import landscape.FitnessLandscape;
+import seededrandom.SeededRandom;
+
 /*
  * Walking step
  * 

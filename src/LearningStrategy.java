@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import landscape.FitnessLandscape;
+import seededrandom.SeededRandom;
+
 /**
  * The Learning Strategy class is a single strategy to navigate around a NKFL.
  * 

@@ -7,6 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import config.PropParser;
+import landscape.DynamicFitnessLandscape;
+import landscape.FitnessLandscape;
+import landscape.FitnessLandscapeFactory;
+import seededrandom.SeededRandom;
 
 public class ExperimentRunner {
 	

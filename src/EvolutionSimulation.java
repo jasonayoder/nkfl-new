@@ -5,6 +5,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Map;
 
+import landscape.DynamicFitnessLandscape;
+import landscape.FitnessLandscape;
+
 public class EvolutionSimulation {
 
 	//Currently runs random sim with given params

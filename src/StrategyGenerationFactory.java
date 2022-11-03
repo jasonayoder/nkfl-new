@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+import seededrandom.SeededRandom;
+
 public class StrategyGenerationFactory {
 //	public static void main(String args[])
 //	{

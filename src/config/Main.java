@@ -19,7 +19,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		// String filename = args[0];    // to avoid needing to change source code
-		String filename = "src/config/default_config.properties";
+		String filename = "src/configFiles/config.properties";
 		PropParser.load(filename);
 	
 		int runs = Constants.RUNS;

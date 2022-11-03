@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+import landscape.FitnessLandscape;
+
 public class WaitStep extends Step {
 	public WaitStep() {
 		
