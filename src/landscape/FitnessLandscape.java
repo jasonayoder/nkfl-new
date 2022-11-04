@@ -17,8 +17,8 @@ public class FitnessLandscape {
 	// Instance Variables
 	public int[] visitedTable; // not sure if should keep this, or make private and add accessor methods
 	public double[] fitTable; // This is set in generateFitnessTable
-	int n; // This is set in constructor
-	int k; // This is set in constructor
+	public int n; // This is set in constructor
+	public int k; // This is set in constructor
 	
 	int landscapeSeed;
 	Random landscapeRnd; //This exists so our entire landscape has its own seed
@@ -250,36 +250,6 @@ public class FitnessLandscape {
 		}
 
 		return true;
-	}
-	
-	public double testStrategyOnLandscape(LearningStrategy strategy, int numTests)
-	{
-		ArrayList<LearningStrategy> strategies = new ArrayList<LearningStrategy>();
-
-		for(int x = 0; x < numTests; x++)
-		{
-			strategies.add(strategy.getDirectChild());
-		}
-		
-		StrategyGeneration gen = new StrategyGeneration(strategies);
-		gen.runAllStrategies();
-		
-		return gen.averageFitness();
-	}
-	
-	public StrategyGeneration testStrategyOnLandscape(ArrayList<Step> strategy, int numTests, int startingLocation)
-	{
-		ArrayList<LearningStrategy> strategies = new ArrayList<LearningStrategy>();
-
-		for(int x = 0; x < numTests; x++)
-		{
-			strategies.add(new LearningStrategy(this, strategy, startingLocation, true));
-		}
-		
-		StrategyGeneration gen = new StrategyGeneration(strategies);
-		gen.runAllStrategies();
-		
-		return gen;
 	}
 	
 	//Static Helper Methods ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

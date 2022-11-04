@@ -1,4 +1,4 @@
-package config;
+package control;
 
 /**
  * This file should list exactly the strings to be referenced from the code
@@ -13,7 +13,7 @@ public class Constants {
 	// Properties (user configurable)
 	public static final int STRATEGY_LENGTH = Integer.parseInt(PropParser.getProperty("strategyLength"));
 	public static final String STRATEGY_STEPS = PropParser.getProperty("strategySteps");
-	public static final String COMPARISON_STRATEGY = PropParser.getProperty("startingStrategy");
+	public static final String STARTING_STRATEGY = PropParser.getProperty("startingStrategy");
 	
 	public static final boolean EVOLVE_STRATEGY =Boolean.parseBoolean(PropParser.getProperty("evolveStrategy"));
 	public static final boolean EVOLVE_GENOTYPE =Boolean.parseBoolean(PropParser.getProperty("evolveGenotype"));

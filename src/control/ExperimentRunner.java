@@ -1,3 +1,4 @@
+package control;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -6,12 +7,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import config.PropParser;
+import LookStep;
+import NDArrayManager;
+import evolution.EvolutionSimulation;
 import landscape.DynamicFitnessLandscape;
 import landscape.FitnessLandscape;
 import landscape.FitnessLandscapeFactory;
 import seededrandom.SeededRandom;
 
+/**
+ * New & Improved Experiment Runner!
+ * 
+ * 
+ * @author jacob
+ *
+ */
 public class ExperimentRunner {
 	
 	
@@ -22,36 +32,7 @@ public class ExperimentRunner {
 	public static void run(String configPath) {
 		
 		PropParser.load(configPath);
-
-//		//Strategy Parameters
-		int strategyLength = Integer.parseInt(PropParser.getProperty("strategyLength"));
-		int sensitivity = Integer.parseInt(PropParser.getProperty("sensitivity"));
-		int maxSensitivity = Integer.parseInt(PropParser.getProperty("maxSensitivity")); //Set this equal to sensitivity for a single sensitiviry run
-		int sensitivityInceremet = Integer.parseInt(PropParser.getProperty("sensitivityInceremet"));
-		
-		//Set to 0 if you don't want to control
-		int numberOfWalks = Integer.parseInt(PropParser.getProperty("numberOfWalks"));
-		LearningStrategy.setNumberOfWalks = numberOfWalks;
-		LearningStrategy.usingWait = Boolean.parseBoolean(PropParser.getProperty("usingWait"));
-
-		//Landscape Parameters
-		int n = Integer.parseInt(PropParser.getProperty("n"));
-		int setk = Integer.parseInt(PropParser.getProperty("setk"));
-		int k = Integer.parseInt(PropParser.getProperty("k"));
-		int maxk = Integer.parseInt(PropParser.getProperty("maxk")); //Set this equal to k for a single k run
-		int kincrement = Integer.parseInt(PropParser.getProperty("kincrement"));
-		
-		//Evolution Parameters
-		String selectionType = PropParser.getProperty("selectionType"); 
-		int numGenerations = Integer.parseInt(PropParser.getProperty("numGenerations"));
-		int popsPerGeneration = Integer.parseInt(PropParser.getProperty("popsPerGeneration"));
-		int childrenPercentage = Integer.parseInt(PropParser.getProperty("childrenPercentage")); //always set to 100 for ranked
-		double mutationPercentage = Double.parseDouble(PropParser.getProperty("mutationPercentage"));
-		
-		//Seed parameters
-		long seed = Integer.parseInt(PropParser.getProperty("seed")); //Set Seed
-//		long seed = SeededRandom.rnd.nextInt(); //Random seed
-		SeededRandom.rnd.setSeed(seed);
+		SeededRandom.rnd.setSeed(Constants.SEED);
 
 		//Data Reporting Parameters
 		int incrementCSVoutput = Integer.parseInt(PropParser.getProperty("incrementCSVoutput"));
@@ -98,73 +79,73 @@ public class ExperimentRunner {
 			return;
 		}
 		
-		HashMap<String, ArrayList<Step>> strats = new HashMap<String, ArrayList<Step>>();
-		
-		ArrayList<Step> pureWalk = new ArrayList<Step>();
-		for(int i = 0; i < strategyLength; i++)
-		{
-			pureWalk.add(new WalkStep());
-		}
-		strats.put("PureWalk", pureWalk);
-		
-//		ArrayList<Step> alternateLookWalk = new ArrayList<Step>();
-//		for(int i = 0; i < strategyLength/2; i++)
+//		HashMap<String, ArrayList<Step>> strats = new HashMap<String, ArrayList<Step>>();
+//		
+//		ArrayList<Step> pureWalk = new ArrayList<Step>();
+//		for(int i = 0; i < strategyLength; i++)
 //		{
-//			alternateLookWalk.add(new LookStep());
+//			pureWalk.add(new WalkStep());
+//		}
+//		strats.put("PureWalk", pureWalk);
+//		
+////		ArrayList<Step> alternateLookWalk = new ArrayList<Step>();
+////		for(int i = 0; i < strategyLength/2; i++)
+////		{
+////			alternateLookWalk.add(new LookStep());
+////			alternateLookWalk.add(new WalkStep());
+////		}
+////		strats.put("AlternateLookWalk", alternateLookWalk);
+////		
+//		//New, smarter alternate
+//		ArrayList<Step> alternateLookWalk = new ArrayList<Step>();
+//		int looksperwalka = (int) Math.floor((n * 1.0/sensitivity));
+//		
+//		while(alternateLookWalk.size() + looksperwalka*2 + 3 < strategyLength)
+//		{
 //			alternateLookWalk.add(new WalkStep());
+//			for(int j = 0; j < looksperwalka; j++)
+//			{
+//				alternateLookWalk.add(new LookStep());
+//			}
+//			alternateLookWalk.add(new WalkStep());
+//			for(int j = 0; j < looksperwalka; j++)
+//			{
+//				alternateLookWalk.add(new LookStep());
+//			}
+//			alternateLookWalk.add(new WalkStep());
+//			
 //		}
 //		strats.put("AlternateLookWalk", alternateLookWalk);
 //		
-		//New, smarter alternate
-		ArrayList<Step> alternateLookWalk = new ArrayList<Step>();
-		int looksperwalka = (int) Math.floor((n * 1.0/sensitivity));
-		
-		while(alternateLookWalk.size() + looksperwalka*2 + 3 < strategyLength)
-		{
-			alternateLookWalk.add(new WalkStep());
-			for(int j = 0; j < looksperwalka; j++)
-			{
-				alternateLookWalk.add(new LookStep());
-			}
-			alternateLookWalk.add(new WalkStep());
-			for(int j = 0; j < looksperwalka; j++)
-			{
-				alternateLookWalk.add(new LookStep());
-			}
-			alternateLookWalk.add(new WalkStep());
-			
-		}
-		strats.put("AlternateLookWalk", alternateLookWalk);
-		
-		ArrayList<Step> SHC = new ArrayList<Step>();
-		int looksperwalk = (int) Math.floor((n * 1.0/sensitivity));
-		
-		for(int i = 0; i < strategyLength/(looksperwalk + 1); i++)
-		{
-			for(int j = 0; j < looksperwalk; j++)
-			{
-				SHC.add(new LookStep());
-			}
-			SHC.add(new WalkStep());
-		}
-		strats.put("Steep Hill Climb", SHC);
-		
-		if(numberOfWalks != 0)
-		{
-			ArrayList<Step> balanced = new ArrayList<Step>();
-			int avgLooksPerWalk = (strategyLength - numberOfWalks) / numberOfWalks;
-			
-			for(int i = 0; i < numberOfWalks; i++)
-			{
-				for(int j = 0; j < avgLooksPerWalk; j++)
-				{
-					balanced.add(new LookStep());
-				}
-				balanced.add(new WalkStep());
-			}
-			
-			strats.put("Balanced", balanced);
-		}
+//		ArrayList<Step> SHC = new ArrayList<Step>();
+//		int looksperwalk = (int) Math.floor((n * 1.0/sensitivity));
+//		
+//		for(int i = 0; i < strategyLength/(looksperwalk + 1); i++)
+//		{
+//			for(int j = 0; j < looksperwalk; j++)
+//			{
+//				SHC.add(new LookStep());
+//			}
+//			SHC.add(new WalkStep());
+//		}
+//		strats.put("Steep Hill Climb", SHC);
+//		
+//		if(numberOfWalks != 0)
+//		{
+//			ArrayList<Step> balanced = new ArrayList<Step>();
+//			int avgLooksPerWalk = (strategyLength - numberOfWalks) / numberOfWalks;
+//			
+//			for(int i = 0; i < numberOfWalks; i++)
+//			{
+//				for(int j = 0; j < avgLooksPerWalk; j++)
+//				{
+//					balanced.add(new LookStep());
+//				}
+//				balanced.add(new WalkStep());
+//			}
+//			
+//			strats.put("Balanced", balanced);
+//		}
 		
 		double numSimsTotal = (((maxk-k)/kincrement)+1) * (((maxSensitivity-sensitivity)/sensitivityInceremet)+1) * simulations * starts * runs;
 		double numSim = 0;
