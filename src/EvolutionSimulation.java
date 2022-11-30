@@ -103,11 +103,13 @@ public class EvolutionSimulation {
 	static final String GenerationHeader = "GENERATION";
 	static final String StrategyRowHeader = "STRATEGY_ROW";
 	static final String WalkProbabilityRowHeader = "WALK_PROBABILITY_ROW";
+	static final String RandomWalkProbabilityRowHeader = "RANDOM_WALK_PROBABILITY_ROW";
 	static final String FitnessRowHeader = "FITNESS_ROW";
 	static final String HammingDistanceFromBestHeader = "HAMMING_DISTANCE_FROM_BEST";
 	static final String AverageFitnessRowHeader = "AVGFITNESS_ROW";
 	static final String ComparisonStrategyHeader = "COMPARISON_STRATEGIES";
 	static final String HammingDistanceFromMaxRowHeader = "HAMMING_DISTANCE_FROM_PHENOTYPE_TO_BEST";
+	static final String AverageHammingDistance = "AVERAGE_STRATEGY_HAMMING_DISTANCE";
 	static final int numTestsForComparison = 1000;
 	public void writeExperimentToCSV(PrintWriter csvWriter, Map<String, ArrayList<Step>> comparisonStrategies, int csvIncrement, int n)
 	{
@@ -115,7 +117,31 @@ public class EvolutionSimulation {
 		for(int gen = 0; gen < generations.size(); gen += csvIncrement)
 		{
 			csvWriter.print(GenerationHeader + "," + gen + "\n");
-			
+			//Write Average Hamming Distance
+			csvWriter.write(AverageHammingDistance);
+			int[][] counts = new int[strategyLength][3]; //TODO: Update when new steps are added or update to be dynamic
+			for(LearningStrategy ls: generations.get(gen).strategies) {
+				for(int i = 0; i<strategyLength; i++) {
+					if(ls.strategy.get(i) instanceof WalkStep) {
+						counts[i][0]++;
+					}else if(ls.strategy.get(i) instanceof LookStep) {
+						counts[i][1]++;
+					}else {
+						counts[i][1]++;
+					}
+				}
+			}
+			double total = 0;
+			for(int i = 0; i<counts.length; i++) {
+				for(int j = 0; j<counts[i].length;j++) {
+					for(int k = j+1; k<counts[i].length;k++) {
+						total += counts[i][j]*counts[i][k];
+					}
+				}
+			}
+			total *= 2;
+			total /= popsPerGeneration*(popsPerGeneration-1)*strategyLength;
+			csvWriter.write(","+total+"\n");
 			//Write strategy to CSV
 			csvWriter.print(StrategyRowHeader);
 			LearningStrategy bestOfGen = generations.get(gen).getBestStrategyOfGeneration();
@@ -143,11 +169,15 @@ public class EvolutionSimulation {
 			
 			//Calculate aggregates
 			double[] probs = new double[strategyLength];
+			double[] randProbs = new double[strategyLength];
 			double[] avgFitnesses = new double[strategyLength];
 			for(LearningStrategy ls : generations.get(gen).strategies) {
 				for(int i = 0; i<strategyLength; i++) {
 					if(ls.strategy.get(i) instanceof WalkStep) {
 						probs[i]++;
+						if(i>0&&(ls.strategy.get(i-1) instanceof WalkStep)) {
+							randProbs[i]++;
+						}
 					}
 					avgFitnesses[i] += ls.fitnessArray[i];
 				}
@@ -158,26 +188,34 @@ public class EvolutionSimulation {
 				csvWriter.print(","+(probs[i]/generations.get(gen).strategies.size()));
 			}
 			csvWriter.print('\n');
+			//Random Walk probs
+			csvWriter.print(RandomWalkProbabilityRowHeader);
+			for(int i = 0; i<strategyLength; i++) {
+				csvWriter.print(","+(randProbs[i]/generations.get(gen).strategies.size()));
+			}
+			csvWriter.print('\n');
 			//Write avg fitnesses
 			csvWriter.print(AverageFitnessRowHeader);
 			for(int i = 0; i<strategyLength; i++) {
 				csvWriter.print(","+(avgFitnesses[i]/generations.get(gen).strategies.size()));
 			}
 			csvWriter.print('\n');
-			//Write distance to max of phenotype
-			csvWriter.write(HammingDistanceFromMaxRowHeader);
-			int max = landscape.maxLoc();
-			for(int phenotype: bestOfGen.getPhenotypeArray()) {
-				int ham = phenotype ^ max;
-				int dist = 0;
-				for(int i = 0; i<landscape.n;i++) {
-					if(0!=(ham&(1<<i))) {
-						dist++;
-					}
-				}
-				csvWriter.print(","+dist);
-			}
-			csvWriter.print('\n');
+//			//Write distance to max of phenotype
+//			csvWriter.write(HammingDistanceFromMaxRowHeader);
+//			int max = landscape.maxLoc();
+//			for(int phenotype: bestOfGen.getPhenotypeArray()) {
+//				int ham = phenotype ^ max;
+//				int dist = 0;
+//				for(int i = 0; i<landscape.n;i++) {
+//					if(0!=(ham&(1<<i))) {
+//						dist++;
+//					}
+//				}
+//				csvWriter.print(","+dist);
+//			}
+//			csvWriter.print('\n');
+			
+			
 		}
 		
 		csvWriter.print(ComparisonStrategyHeader);

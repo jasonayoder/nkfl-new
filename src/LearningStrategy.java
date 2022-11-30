@@ -304,14 +304,14 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		}
 	}
 	
-	public int hammingDistance(LearningStrategy ls) {
+	public double hammingDistance(LearningStrategy ls) {
 		int ham = 0;
 		for(int i = 0; i<strategy.size(); i++) {
-			if(this.strategy.get(i).equals(ls.strategy.get(i))) {
+			if(!this.strategy.get(i).equals(ls.strategy.get(i))) {
 				ham++;
 			}
 		}
-		return ham;
+		return ham/(1.0*strategy.size());
 	}
 	
 	/**

@@ -22,7 +22,7 @@ with open(filename) as csvfile:
         if line[0] == "GENERATION":
             # print("gen:"+line[1])
             gen=int(line[1])
-        elif line[0] == "HAMMING_DISTANCE_FROM_BEST":
+        elif line[0] == "AVERAGE_STRATEGY_HAMMING_DISTANCE":
             # print("fit:"+line[-1])
             # if randWalk:
             #     comparisonFitnesses[runs-1]["RandomWalk"] = [float(el) for el in line[1:]]
@@ -34,7 +34,7 @@ with open(filename) as csvfile:
             #     comparisonFitnesses[runs-1]["alternateLookWalk"] = [float(el) for el in line[1:]]
             #     alternateLookWalk = False
             # else:
-            generationFitnesses[runs][gen] = [float(el) for el in line[1:]]
+            generationFitnesses[runs][gen] = float(line[1])
         elif line[0] == "COMPARISON_STRATEGIES":
             runs += 1
             generationFitnesses.append({})
@@ -75,7 +75,7 @@ for key,value in genFitRearrange.items():
     # mean.append(np.mean(i))
     # low.append(np.mean(i) - (np.std(i)/np.sqrt(len(value))))
     # high.append(np.mean(i) + (np.std(i)/np.sqrt(len(value))))
-plt.plot(genFitRearrange.keys(), mean,label="Final Generation")
+plt.plot(genFitRearrange.keys(), mean)
 plt.fill_between(genFitRearrange.keys(), low, high, alpha=.25)
 
 plt.legend()

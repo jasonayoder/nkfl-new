@@ -24,7 +24,7 @@ with open(filename) as csvfile:
         if line[0] == "GENERATION":
             gen=int(line[1])
         
-        elif line[0] == "WALK_PROBABILITY_ROW":
+        elif line[0] == "RANDOM_WALK_PROBABILITY_ROW":
             generationWalkProb[runs][gen] = []
             for s in line[1:]:
                 generationWalkProb[runs][gen].append(float(s))
@@ -42,19 +42,10 @@ for runVals in generationWalkProb:
             genWalkRearrange[key] = []
         genWalkRearrange[key].append(val)
 maxGen = max(genWalkRearrange.keys())
-# for gen,val in genWalkRearrange.items():
-    # x = range(0,len(val[0]))
-    # y = np.average(val,axis=0)
-    # ax.plot(x,y,zs=gen,zdir='z',color=[gen/maxGen,0,0])
-i = 0
-for gen in genWalkRearrange.keys():
-    if(i==0):
-        val = genWalkRearrange[gen]
-        x = range(0,len(val[0]))
-        y = np.average(val,axis=0)
-        ax.plot(x,y,zs=gen,zdir='z',color=[gen/maxGen,0,0])
-    i+=1
-    i= i%50
+for gen,val in genWalkRearrange.items():
+    x = range(0,len(val[0]))
+    y = np.average(val,axis=0)
+    ax.plot(x,y,zs=gen,zdir='z',color=[gen/maxGen,0,0])
 
 # plt.legend()
 plt.xlabel("steps") 
