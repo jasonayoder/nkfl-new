@@ -118,7 +118,7 @@ public class EvolutionSimulation {
 			
 			//Write strategy to CSV
 			csvWriter.print(StrategyRowHeader);
-			LearningStrategy bestOfGen = generations.get(gen).getBestStrategyOfGeneration();
+			Agent bestOfGen = generations.get(gen).getBestStrategyOfGeneration();
 			for(String step : bestOfGen.getStrategyStringArray())
 			{
 				csvWriter.print("," + step);

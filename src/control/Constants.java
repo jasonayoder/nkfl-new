@@ -15,6 +15,9 @@ public class Constants {
 	public static final String STRATEGY_STEPS = PropParser.getProperty("strategySteps");
 	public static final String STARTING_STRATEGY = PropParser.getProperty("startingStrategy");
 	
+	public static final int BLOCKS = Integer.parseInt(PropParser.getProperty("blocks"));
+	public static final int BLOCK_LENGTH = Integer.parseInt(PropParser.getProperty("blockLength"));
+	
 	public static final boolean EVOLVE_STRATEGY =Boolean.parseBoolean(PropParser.getProperty("evolveStrategy"));
 	public static final boolean EVOLVE_GENOTYPE =Boolean.parseBoolean(PropParser.getProperty("evolveGenotype"));
 	

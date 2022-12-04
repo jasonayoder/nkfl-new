@@ -20,7 +20,7 @@ import seededrandom.SeededRandom;
  */
 public class StrategyGeneration {
 	
-	public ArrayList<LearningStrategy> strategies = new ArrayList<LearningStrategy>();
+	public ArrayList<Agent> strategies = new ArrayList<Agent>();
 	public FitnessLandscape landscape;
 	public int startingLocation;
 	public int strategyLength;
@@ -41,7 +41,7 @@ public class StrategyGeneration {
 		
 		for(int i = 0; i < numStrategies; i++)
 		{
-			strategies.add(new LearningStrategy(landscape, strategyLength, startingLocation));
+			strategies.add(new Agent(landscape, strategyLength, startingLocation));
 		}
 	}
 	
@@ -50,7 +50,7 @@ public class StrategyGeneration {
 	 * 
 	 * @param strategies
 	 */
-	public StrategyGeneration(ArrayList<LearningStrategy> strategies)
+	public StrategyGeneration(ArrayList<Agent> strategies)
 	{
 		this.strategies = strategies;
 		if(strategies.size() == 0)
@@ -59,25 +59,25 @@ public class StrategyGeneration {
 			return;
 		}
 		landscape = strategies.get(0).landscape;
-		strategyLength = strategies.get(0).strategy.size();
+		strategyLength = strategies.get(0).developmentalProgram.size();
 		startingLocation = strategies.get(0).genotype;
 	}
 
-	public LearningStrategy getBestStrategyOfGeneration()
+	public Agent getBestStrategyOfGeneration()
 	{
 		this.sortStrategies();
 		return strategies.get(strategies.size() - 1);
 	}
 	
 	public void runAllStrategies() {
-		for(LearningStrategy strategy : strategies)
+		for(Agent strategy : strategies)
 		{
 			strategy.executeStrategy();
 		}
 	}
 	
 	public void runAllStrategies(int sampleSize) {
-		for(LearningStrategy strategy : strategies)
+		for(Agent strategy : strategies)
 		{
 			strategy.executeStrategy(sampleSize);
 		}
@@ -85,7 +85,7 @@ public class StrategyGeneration {
 	
 	public double averageFitness() {
 		double sumOfFitnesses = 0;
-		for(LearningStrategy strategy : strategies)
+		for(Agent strategy : strategies)
 		{
 			sumOfFitnesses += strategy.phenotypeFitness;
 		}
@@ -94,7 +94,7 @@ public class StrategyGeneration {
 	
 	public double averageFitnessAtStep(int step) {
 		double sumOfFitnesses = 0;
-		for(LearningStrategy strategy : strategies)
+		for(Agent strategy : strategies)
 		{
 			sumOfFitnesses += strategy.getFitnessAtStep(step);
 		}
@@ -109,25 +109,25 @@ public class StrategyGeneration {
 		return strategyLength;
 	}
 	
-	public LearningStrategy getDirectChild(int index)
+	public Agent getDirectChild(int index)
 	{
 		return strategies.get(index).getDirectChild();
 	}
 	
-	public LearningStrategy getRandomStrategy()
+	public Agent getRandomStrategy()
 	{
 		int index = SeededRandom.rnd.nextInt(strategies.size());
 		return strategies.get(index);
 	}
 	
-	public LearningStrategy getStrategyAtIndex(int index)
+	public Agent getStrategyAtIndex(int index)
 	{
 		return strategies.get(index);
 	}
 	
 	public void mutateGeneration(double mutationPercentage)
 	{
-		for(LearningStrategy strat : strategies)
+		for(Agent strat : strategies)
 		{
 			strat.mutate(mutationPercentage);
 		}
@@ -139,7 +139,7 @@ public class StrategyGeneration {
 		for(int stepNum = 0; stepNum < strategyLength; stepNum++)
 		{
 			double currentAvg = 0;
-			for(LearningStrategy strat : strategies)
+			for(Agent strat : strategies)
 			{
 				currentAvg += strat.getFitnessAtStep(stepNum);
 			}

@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import control.Constants;
 import landscape.FitnessLandscape;
@@ -27,9 +28,12 @@ import seededrandom.SeededRandom;
  * @author Jacob Ashworth, Edward Kim, Lyra Lee
  *
  */
-public class LearningStrategy implements Comparable<LearningStrategy>{
+public class Agent implements Comparable<Agent>{
 	//Data needed to function
-	String[] strategy;
+	
+	Integer[] developmentalProgram;
+	HashMap<Integer, ArrayList<Step>> blockSteps;
+	
 	public double[] fitnessArray; //fitnesses at each step
 	public FitnessLandscape landscape; // This LearningStrategy's NKFL
 	
@@ -39,10 +43,10 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	public double genotypeFitness; // save this data so we don't have to recompute it every time we reset
 	
 	//Default constructor for random genotype
-	public LearningStrategy(FitnessLandscape landscape)
+	public Agent(FitnessLandscape landscape)
 	{
 		this.landscape = landscape;
-		this.strategy = getStrategy();
+		this.setupStrategy();
 		this.genotype = SeededRandom.rnd.nextInt((int)Math.pow(2, landscape.n));
 		this.genotypeFitness = landscape.fitness(genotype);
 		this.phenotype = genotype;
@@ -50,7 +54,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	}
 	
 	//Overloaded constructor for specific genotype
-	public LearningStrategy(FitnessLandscape landscape, int genotype)
+	public Agent(FitnessLandscape landscape, int genotype)
 	{
 		this(landscape);
 		//Overwrite the random genotype with ours
@@ -89,9 +93,9 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		}
 		
 		//actually execute our strategy
-		for(int step=0; step < strategy.length; step++)
+		for(int step=0; step < developmentalProgram.length; step++)
 		{
-			if(strategy[step].equals("RW"))
+			if(developmentalProgram[step].equals("RW"))
 			{
 				RWStep(phenotypeArray);
 				fitnessArray[phenotype] = landscape.fitness(phenotype);
@@ -124,39 +128,45 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		}
 	}
 	
-	private static String[] getStrategy() {
-		String[] strategy = new String[Constants.STRATEGY_LENGTH];
+	private void setupStrategy() {
+		Integer[] strategy = new Integer[Constants.STRATEGY_LENGTH];
 		
 		if(Constants.STARTING_STRATEGY.equals("NONE"))
 		{
-			String[] availableSteps = Constants.STRATEGY_STEPS.split(",");
-			
-			for(int i=0; i<strategy.length; i++)
+			for(int block=0; block < Constants.BLOCKS; block++)
 			{
-				int step = SeededRandom.rnd.nextInt(availableSteps.length);
-				strategy[i] = availableSteps[step];
+				ArrayList<Step> thisBlockSteps = new ArrayList<Step>();
+				for(int step=0; step<Constants.BLOCK_LENGTH; step++)
+				{
+					thisBlockSteps.add(Step.randomStep());
+				}
+				blockSteps.put(block, thisBlockSteps);
+			}
+			
+			for(int step=0; step < Constants.STRATEGY_LENGTH; step++)
+			{
+//				strategy
 			}
 		}
 		else if(Constants.STARTING_STRATEGY.equals("PURERANDOMWALK"))
 		{
-			for(int i=0; i<strategy.length; i++)
-			{
-				strategy[i] = "RW";
-			}
+			//TODO
 		}
 		else
-		{
+		{ 
 			System.err.println("startingStrategy not recognized.  Set to 'NONE' for standard evolutionary run");
 		}
 		
 		return strategy;
 	}
+	
+
 
 	/**
 	 * Compares fitness for sorting
 	 */
 	@Override
-	public int compareTo(LearningStrategy otherStrategy) {
+	public int compareTo(Agent otherStrategy) {
 		if(this.phenotypeFitness > otherStrategy.phenotypeFitness)
 		{
 			return 1;
