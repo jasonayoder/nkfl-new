@@ -67,7 +67,7 @@ public class EvolutionSimulation {
 			generations.add(nextGen);
 			//Run the next generation
 			nextGen.runAllStrategies();
-			System.out.println("Completed Generation " + i);
+//			System.out.println("Completed Generation " + i);
 //			System.out.println(nextGen.averageFitness());
 			if(i%tau==0) {
 				landscape.nextCycle();
