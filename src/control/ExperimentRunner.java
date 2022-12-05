@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import LookStep;
-import NDArrayManager;
 import evolution.EvolutionSimulation;
 import landscape.DynamicFitnessLandscape;
 import landscape.FitnessLandscape;
@@ -31,37 +29,21 @@ public class ExperimentRunner {
 	}
 	
 	public static void run(String configPath) {
-		
 		PropParser.load(configPath);
-		SeededRandom.rnd.setSeed(Constants.SEED);
-
-		//Data Reporting Parameters
-		int incrementCSVoutput = Integer.parseInt(PropParser.getProperty("incrementCSVoutput"));
-		String experimentName = PropParser.getProperty("filename");
-		if(experimentName == null) {
-			experimentName = "Config_Experiment_" + Constants.SEED + "_" + Constants.SELECTION_TYPE;
-		}
 		
-		String landscapeName = PropParser.getProperty("landscapeName");
-		String landscapeParams = PropParser.getProperty("landscapeParams");
+		SeededRandom.rnd.setSeed(Constants.SEED);
+		
 		int tau = Integer.MAX_VALUE;
 		try{
-			tau = Integer.parseInt(PropParser.getProperty("generationsPerCycle"));
+			tau = Constants.LANDSCAPE_GENERATIONS_PER_CYCLE; 
 		}catch(NumberFormatException e) {
 			System.out.println("generationsPerCycle not provided continuing with SOP");
 		}
 		
-		System.out.println(experimentName);
+		System.out.println(Constants.FILENAME);
 		PrintWriter csvWriter;
-		File csvFile = new File(experimentName);
+		File csvFile = new File(Constants.FILENAME);
 
-		
-		//Num Simulation Parameters
-		int simulations = Integer.parseInt(PropParser.getProperty("simulations"));
-		int starts = Integer.parseInt(PropParser.getProperty("starts"));
-		int runs = Integer.parseInt(PropParser.getProperty("runs"));
-		int strategyRuns = Integer.parseInt(PropParser.getProperty("strategyRuns"));
-		
 		//Setup CSV writer
 		try {
 			csvWriter = new PrintWriter(csvFile + ".csv");
@@ -71,9 +53,27 @@ public class ExperimentRunner {
 			return;
 		}
 		
+		for(int n=Constants.N_START; n <= Constants.N_START+(Constants.N_INCREMENT*Constants.N_INCREMENT_SIZE); n += Math.max(Constants.N_INCREMENT_SIZE,1))
+		{
+			for(int k=Constants.K_START; k <= Constants.K_START+(Constants.K_INCREMENT*Constants.K_INCREMENT_SIZE); k += Math.max(Constants.K_INCREMENT_SIZE, 1))
+			{
+				for(int landscapeNum = 0; landscapeNum < Constants.LANDSCAPES; landscapeNum++)
+				{
+					DynamicFitnessLandscape landscape = FitnessLandscapeFactory.getLandscape(n,k,SeededRandom.rnd.nextInt(),Constants.LANDSCAPE_NAME,Constants.LANDSCAPE_PARAMS);
+					for(int run=0; run < Constants.RUNS_PER_LANDSCAPE; run++)
+					{
+						EvolutionSimulation sim = new EvolutionSimulation(landscape, tau);
+						sim.runSimulation();
+						sim.writeExperimentToCSV(csvWriter);
+					}
+				}
+			}
+		}
+		
+		
 		//
 		
-		System.out.println("Data successfully written to " + experimentName + ".csv");
+		System.out.println("Data successfully written to " + Constants.FILENAME + ".csv");
 		
 		//cleanup
 		csvWriter.flush();

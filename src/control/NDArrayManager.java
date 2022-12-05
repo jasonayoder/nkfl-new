@@ -1,3 +1,4 @@
+package control;
 import java.util.Random;
 
 import seededrandom.SeededRandom;

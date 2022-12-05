@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import control.Constants;
 import landscape.FitnessLandscape;
 import seededrandom.SeededRandom;
 
@@ -18,30 +19,34 @@ import seededrandom.SeededRandom;
  * @author Jacob Ashworth
  *
  */
-public class StrategyGeneration {
+public class Generation {
 	
 	public ArrayList<Agent> strategies = new ArrayList<Agent>();
 	public FitnessLandscape landscape;
-	public int startingLocation;
-	public int strategyLength;
 	
 	/**
 	 * Declares a strategy generation with a given landscape, number of strategies,
-	 * and strategy length.  The LearningStrategies are then randomly generated.
+	 * and strategy length.  The Agents are then randomly generated.
 	 * 
 	 * @param landscape FitnessLandscape
-	 * @param numStrategies Number of strategies
-	 * @param strategyLength Length of the strategies
 	 */
-	public StrategyGeneration(FitnessLandscape landscape, int numStrategies, int strategyLength, int startingLocation)
+	public Generation(FitnessLandscape landscape)
 	{
 		this.landscape = landscape;
-		this.strategyLength = strategyLength;
-		this.startingLocation = startingLocation;
 		
-		for(int i = 0; i < numStrategies; i++)
+		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
 		{
-			strategies.add(new Agent(landscape, strategyLength, startingLocation));
+			strategies.add(new Agent(landscape));
+		}
+	}
+	
+	public Generation(FitnessLandscape landscape, int genotype)
+	{
+		this.landscape = landscape;
+		
+		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
+		{
+			strategies.add(new Agent(landscape, genotype));
 		}
 	}
 	
@@ -50,7 +55,7 @@ public class StrategyGeneration {
 	 * 
 	 * @param strategies
 	 */
-	public StrategyGeneration(ArrayList<Agent> strategies)
+	public Generation(ArrayList<Agent> strategies)
 	{
 		this.strategies = strategies;
 		if(strategies.size() == 0)
@@ -59,27 +64,18 @@ public class StrategyGeneration {
 			return;
 		}
 		landscape = strategies.get(0).landscape;
-		strategyLength = strategies.get(0).developmentalProgram.size();
-		startingLocation = strategies.get(0).genotype;
 	}
 
 	public Agent getBestStrategyOfGeneration()
 	{
 		this.sortStrategies();
-		return strategies.get(strategies.size() - 1);
+		return strategies.get(0);
 	}
 	
 	public void runAllStrategies() {
 		for(Agent strategy : strategies)
 		{
 			strategy.executeStrategy();
-		}
-	}
-	
-	public void runAllStrategies(int sampleSize) {
-		for(Agent strategy : strategies)
-		{
-			strategy.executeStrategy(sampleSize);
 		}
 	}
 	
@@ -96,7 +92,7 @@ public class StrategyGeneration {
 		double sumOfFitnesses = 0;
 		for(Agent strategy : strategies)
 		{
-			sumOfFitnesses += strategy.getFitnessAtStep(step);
+			sumOfFitnesses += strategy.fitnessArray[step];
 		}
 		return sumOfFitnesses / strategies.size();
 	}
@@ -105,13 +101,9 @@ public class StrategyGeneration {
 		return strategies.size();
 	}
 	
-	public int getStrategyLength() {
-		return strategyLength;
-	}
-	
 	public Agent getDirectChild(int index)
 	{
-		return strategies.get(index).getDirectChild();
+		return strategies.get(index).identicalChild();
 	}
 	
 	public Agent getRandomStrategy()
@@ -125,31 +117,46 @@ public class StrategyGeneration {
 		return strategies.get(index);
 	}
 	
-	public void mutateGeneration(double mutationPercentage)
-	{
-		for(Agent strat : strategies)
-		{
-			strat.mutate(mutationPercentage);
-		}
-	}
-	
 	public double[] getAverageFitnessAtSteps()
 	{
-		double[] avg = new double[strategyLength];
-		for(int stepNum = 0; stepNum < strategyLength; stepNum++)
+		double[] avg = new double[Constants.TOTAL_LENGTH+1];
+		for(int stepNum = 0; stepNum < Constants.TOTAL_LENGTH+1; stepNum++)
 		{
-			double currentAvg = 0;
-			for(Agent strat : strategies)
-			{
-				currentAvg += strat.getFitnessAtStep(stepNum);
-			}
-			currentAvg /= strategies.size();
-			avg[stepNum] = currentAvg;
+			avg[stepNum] = this.averageFitnessAtStep(stepNum);
 		}
 		return avg;
 	}
 	
+	public Generation getNextGenerationTruncation()
+	{
+		this.sortStrategies();
+		ArrayList<Agent> nextGeneration = new ArrayList<Agent>();
+		
+		for(int i=0; i<Constants.GENERATION_SIZE/2; i++)//Add the top half
+		{
+			nextGeneration.add(strategies.get(i).identicalChild());
+		}
+		if(Constants.GENERATION_SIZE % 2 == 1)//If odd number of generations, add one more
+		{
+			nextGeneration.add(strategies.get(Constants.GENERATION_SIZE/2+1).identicalChild());
+		}
+		for(int i=0; i<Constants.GENERATION_SIZE/2; i++)//Add the bottom half, but mutated
+		{
+			Agent child = strategies.get(i).identicalChild();
+			child.mutate();
+			nextGeneration.add(child);
+		}
+		
+		return new Generation(nextGeneration);
+	}
+	
+	//The code sorts it so that the best strategies are first
 	public void sortStrategies() {
 		Collections.sort(strategies);
+		Collections.reverse(strategies);
+		if(strategies.get(0).phenotypeFitness < strategies.get(strategies.size()-1).phenotypeFitness)
+		{
+			System.out.println("Sorting backwards");
+		}
 	}
 }

@@ -20,7 +20,7 @@ public class FitnessLandscape {
 	public int n; // This is set in constructor
 	public int k; // This is set in constructor
 	
-	int landscapeSeed;
+	public int landscapeSeed;
 	Random landscapeRnd; //This exists so our entire landscape has its own seed
 
 	/**
@@ -235,6 +235,48 @@ public class FitnessLandscape {
 			}
 		}
 		return greatest;
+	}
+	
+	//the same as greatest neighbor, but returns the index of the difference between greatestNeighbor&location
+	public int greatestNeighborBit(int location)
+	{
+		int greatest = location;
+		double greatestFitness = this.fitness(greatest);
+		int locationDiff = -1; //we return -1 if location is the greatest
+		
+		double testFitness;
+		for(int i = 0; i < n; i++)
+		{
+			int temp = location ^ (1<<i);
+			testFitness = this.fitness(temp);
+			if (testFitness > greatestFitness) {
+				locationDiff = i;
+				greatest = temp;
+				greatestFitness = testFitness;
+			}
+		}
+		return locationDiff;
+	}
+	
+	//opposite of greatestNeighborBit
+	public int leastNeighborBit(int location)
+	{
+		int greatest = location;
+		double greatestFitness = this.fitness(greatest);
+		int locationDiff = -1; //we return -1 if location is the greatest
+		
+		double testFitness;
+		for(int i = 0; i < n; i++)
+		{
+			int temp = location ^ (1<<i);
+			testFitness = this.fitness(temp);
+			if (testFitness < greatestFitness) {
+				locationDiff = i;
+				greatest = temp;
+				greatestFitness = testFitness;
+			}
+		}
+		return locationDiff;
 	}
 	
 	public boolean isLocalMaxima(int genotype)
