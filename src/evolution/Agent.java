@@ -379,6 +379,7 @@ public class Agent implements Comparable<Agent>{
 					this.flipPhenotypeAndArray(index, phenotypeArray);
 				}
 			}
+			this.genotype = phenotype;
 		}
 		
 		if(Constants.BLOCK_MUTATION_RATE > 0)
