@@ -199,6 +199,12 @@ public class Agent implements Comparable<Agent>{
 						//fall steeply
 						steepestFall(phenotypeArray);
 						break;
+					case RandomIfMinimaElseSteepestFall:
+						randomIfMinimaElseSteepestFall(phenotypeArray);
+						break;
+					case RandomIfMaximaElseSteepestClimb:
+						randomIfMaximaElseSteepestClimb(phenotypeArray);
+						break;
 					default:
 						System.out.println("Step not recognized: " + step);
 						break;
@@ -279,6 +285,8 @@ public class Agent implements Comparable<Agent>{
 		return calculatedPhenotype == phenotype;
 	}
 	
+//	private boolean random,climb,fall = false;
+	
 	private void randomWalk(int[] phenotypeArray)
 	{
 		int index = SeededRandom.rnd.nextInt(phenotypeArray.length);
@@ -307,6 +315,34 @@ public class Agent implements Comparable<Agent>{
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
 	}
 
+	private void randomIfMinimaElseSteepestFall(int[] phenotypeArray)
+	{
+		int locationDiff = landscape.leastNeighborBit(phenotype);
+		if(locationDiff==-1)
+		{
+			randomWalk(phenotypeArray);
+			return;
+		}
+		flipPhenotypeAndArray(locationDiff, phenotypeArray);
+	}
+	private void randomIfMaximaElseSteepestClimb(int[] phenotypeArray)
+	{
+		int locationDiff = landscape.greatestNeighborBit(phenotype);
+		if(locationDiff==-1)
+		{
+			randomWalk(phenotypeArray);
+			return;
+		}
+		flipPhenotypeAndArray(locationDiff, phenotypeArray);
+	}
+	
+//	private void sameAction(int[] phenotypeArray) {
+//		if(random) {
+//			randomWalk(phenotype);
+//			return; 
+//		}
+//	}
+	
 	private void flipPhenotypeAndArray(int index, int[] phenotypeArray)
 	{
 		if(phenotypeArray[index] == 0)

@@ -9,7 +9,7 @@ import control.Constants;
 import seededrandom.SeededRandom;
 
 public enum Step {
-	RandomWalk, SteepestClimb, SteepestFall;
+	RandomWalk, SteepestClimb, SteepestFall, RandomIfMaximaElseSteepestClimb, RandomIfMinimaElseSteepestFall;
 	
 	private static final List<Step> VALUES =
 			Collections.unmodifiableList(Arrays.asList(values()));
@@ -29,6 +29,14 @@ public enum Step {
 		if(Constants.BLOCK_STEPS.contains("SteepestFall"))
 		{
 			validSteps.add(SteepestFall);
+		}
+		if(Constants.BLOCK_STEPS.contains("RandomIfMaximaElseSteepestClimb"))
+		{
+			validSteps.add(RandomIfMaximaElseSteepestClimb);
+		}
+		if(Constants.BLOCK_STEPS.contains("RandomIfMinimaElseSteepestFall"))
+		{
+			validSteps.add(RandomIfMinimaElseSteepestFall);
 		}
 		return validSteps;
 	}
