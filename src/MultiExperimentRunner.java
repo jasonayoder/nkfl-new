@@ -8,8 +8,7 @@ public class MultiExperimentRunner {
 			for(int i = 0; i<args.length;i++) {
 				File f = new File(args[i]);
 				run(f);
-			}
-			
+			}	
 		}
 	}
 	public static void run(File f) {

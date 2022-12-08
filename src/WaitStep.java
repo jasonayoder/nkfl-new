@@ -5,7 +5,8 @@ public class WaitStep extends Step {
 		
 	}
 	
-	public int execute(FitnessLandscape landscape, int phenotype, ArrayList<Integer> lookedLocations) {
+	public int execute(FitnessLandscape landscape, int phenotype, ArrayList<Integer> lookedLocations, ArrayList<Action> past) {
+		past.add(Action.WAIT);
 		return phenotype;
 	}
 	

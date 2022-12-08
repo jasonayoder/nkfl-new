@@ -27,6 +27,9 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	//Data needed to function
 	ArrayList<Step> strategy;
 	ArrayList<Integer> lookedLocations = new ArrayList<Integer>();
+	private final Step[] steps;
+//	private final Step[] steps = {new AscendIfLookedStep(),new AscendIfLookedHigherStep(), new DescendIfLookedStep(), new DescendIfLookedLowerStep(), new DescendStep(), new LookStep(), new RandStep(), new RepeatStep(), new WaitStep(), new WalkStep()};
+//	private final Step[] steps = {new LookStep(), new WalkStep()};
 	public double[] fitnessArray; //fitnesses at each step
 	public int[] phenotypeArray;
 	public FitnessLandscape landscape; // This LearningStrategy's NKFL
@@ -40,8 +43,15 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	
 	public boolean ignoreWalkNumber = false;
 	boolean strategyExecuted = false;
+	ArrayList<Action> past;
 	
 	public LearningStrategy(FitnessLandscape landscape, ArrayList<Step> strategy, int genotype, boolean ignoreWalkNumber) {
+		if(usingWait) {
+//			steps = new Step[] {new AscendIfLookedElseLook(),new AscendIfLookedHigherElseLook(), new DescendIfLookedElseLook(), new DescendIfLookedLowerElseLook(), new DescendIfLookedLessElseRandom(), new LookStep(), new RandStep(), new RepeatStep(), new WaitStep(), new AscendIfLookedHigherElseRandom()};
+			steps = new Step[] {new LookStep(), new AscendIfLookedHigherElseRandom(), new AscendIfLookedHigherElseLookIfLookedElseLook(), new RepeatStep()};
+		}else {
+			steps = new Step[] {new LookStep(), new AscendIfLookedHigherElseRandom()};
+		}
 		this.ignoreWalkNumber = ignoreWalkNumber;
 		this.landscape = landscape;
 		this.strategy = new ArrayList<Step>();
@@ -50,7 +60,9 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		{
 			this.strategy.add(s);
 		}
-
+		past = new ArrayList<>();
+		past.add(Action.WAIT);
+		
 		initializeArrays(genotype);
 	}
 	
@@ -61,6 +73,12 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	 * @param strategyArray the array representing the strategy
 	 */
 	public LearningStrategy(FitnessLandscape landscape, ArrayList<Step> strategy, int genotype) {
+		if(usingWait) {
+//			steps = new Step[] {new AscendIfLookedElseLook(),new AscendIfLookedHigherElseLook(), new DescendIfLookedElseLook(), new DescendIfLookedLowerElseLook(), new DescendIfLookedLessElseRandom(), new LookStep(), new RandStep(), new RepeatStep(), new WaitStep(), new AscendIfLookedHigherElseRandom()};
+			steps = new Step[] {new LookStep(), new AscendIfLookedHigherElseRandom(), new AscendIfLookedHigherElseLookIfLookedElseLook(), new RepeatStep()};
+		}else {
+			steps = new Step[] {new LookStep(), new AscendIfLookedHigherElseRandom()};
+		}
 		this.landscape = landscape;
 		this.strategy = new ArrayList<Step>();
 		
@@ -68,7 +86,8 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		{
 			this.strategy.add(s);
 		}
-
+		past = new ArrayList<>();
+		past.add(Action.WAIT);
 		initializeArrays(genotype);
 	}
 
@@ -79,6 +98,12 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	 * @param strategyLength the desired length of the strategy
 	 */
 	public LearningStrategy(FitnessLandscape landscape, int strategyLength, int genotype) {
+		if(usingWait) {
+//			steps = new Step[] {new AscendIfLookedElseLook(),new AscendIfLookedHigherElseLook(), new DescendIfLookedElseLook(), new DescendIfLookedLowerElseLook(), new DescendIfLookedLessElseRandom(), new LookStep(), new RandStep(), new RepeatStep(), new WaitStep(), new AscendIfLookedHigherElseRandom()};
+			steps = new Step[] {new LookStep(), new AscendIfLookedHigherElseRandom(), new AscendIfLookedHigherElseLookIfLookedElseLook(), new RepeatStep()};
+		}else {
+			steps = new Step[] {new LookStep(), new AscendIfLookedHigherElseRandom()};
+		}
 		this.landscape = landscape;
 		
 		
@@ -88,7 +113,8 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		{
 			strategy.add(this.getRandomStep());
 		}
-		
+		past = new ArrayList<>();
+		past.add(Action.WAIT);
 		initializeArrays(genotype);
 	}
 	
@@ -142,32 +168,33 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	
 	//Not sure if this is the best implementation
 	public Step getRandomStep() {
-		int roll;
-		if(!usingWait)
-		{
-			roll = SeededRandom.rnd.nextInt(2);
-		}
-		else
-		{
-			roll = SeededRandom.rnd.nextInt(3);
-		}
-		if(roll == 0)
-		{
-			return new WalkStep();
-		}
-		else if(roll == 1)
-		{
-			return new LookStep();
-		}
-		else if(roll == 2)
-		{
-			return new WaitStep();
-		}
-		else
-		{
-			System.err.println("Step not implemented");
-			return null;
-		}
+		return steps[SeededRandom.rnd.nextInt(steps.length)];
+//		int roll;
+//		if(!usingWait)
+//		{
+//			roll = SeededRandom.rnd.nextInt(2);
+//		}
+//		else
+//		{
+//			roll = SeededRandom.rnd.nextInt(3);
+//		}
+//		if(roll == 0)
+//		{
+//			return new AscendIfLookedHigherElseRandom();
+//		}
+//		else if(roll == 1)
+//		{
+//			return new LookStep();
+//		}
+//		else if(roll == 2)
+//		{
+//			return new WaitStep();
+//		}
+//		else
+//		{
+//			System.err.println("Step not implemented");
+//			return null;
+//		}
 	}
 
 	/**
@@ -183,7 +210,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 			{
 				Step current = strategy.get(i);
 				
-				this.phenotype = current.execute(landscape, phenotype, lookedLocations);
+				this.phenotype = current.execute(landscape, phenotype, lookedLocations, past);
 				this.phenotypeFitness = landscape.fitness(phenotype);
 				
 				fitnessArray[i] = this.phenotypeFitness;
@@ -210,7 +237,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 				{
 					Step current = strategy.get(i);
 					
-					this.phenotype = current.execute(landscape, phenotype, lookedLocations);
+					this.phenotype = current.execute(landscape, phenotype, lookedLocations, past);
 					this.phenotypeFitness = landscape.fitness(phenotype);
 					fitnessArray[i] = this.phenotypeFitness;
 					phenotypeArray[i] = this.phenotype;
@@ -321,48 +348,49 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 	
 	//Pretty sure this is a bad solution, but with classes we don't have another option...
 	public void mutateStep(int i) {
-		int roll = 0;
-		if(usingWait)
-		{
-		    roll = SeededRandom.rnd.nextInt(2);
-		}
-		if(strategy.get(i).getStepName() == "Look")
-		{
-			if(roll == 0)
-			{
-				strategy.set(i, new WalkStep());
-			}
-			else
-			{
-				strategy.set(i, new WaitStep());
-			}
-		}
-		else if(strategy.get(i).getStepName() == "Walk")
-		{
-			if(roll == 0)
-			{
-				strategy.set(i, new LookStep());
-			}
-			else
-			{
-				strategy.set(i, new WaitStep());
-			}
-		}
-		else if(strategy.get(i).getStepName() == "Wait")
-		{
-			if(roll == 0)
-			{
-				strategy.set(i, new WalkStep());
-			}
-			else
-			{
-				strategy.set(i, new LookStep());
-			}
-		}
-		else
-		{
-			System.err.println("Could not determine step to mutate");
-		}
+		strategy.set(i, getRandomStep());
+//		int roll = 0;
+//		if(usingWait)
+//		{
+//		    roll = SeededRandom.rnd.nextInt(2);
+//		}
+//		if(strategy.get(i).getStepName() == "Look")
+//		{
+//			if(roll == 0)
+//			{
+//				strategy.set(i, new WalkStep());
+//			}
+//			else
+//			{
+//				strategy.set(i, new WaitStep());
+//			}
+//		}
+//		else if(strategy.get(i).getStepName() == "Walk")
+//		{
+//			if(roll == 0)
+//			{
+//				strategy.set(i, new LookStep());
+//			}
+//			else
+//			{
+//				strategy.set(i, new WaitStep());
+//			}
+//		}
+//		else if(strategy.get(i).getStepName() == "Wait")
+//		{
+//			if(roll == 0)
+//			{
+//				strategy.set(i, new WalkStep());
+//			}
+//			else
+//			{
+//				strategy.set(i, new LookStep());
+//			}
+//		}
+//		else
+//		{
+//			System.err.println("Could not determine step to mutate");
+//		}
 	}
 	
 	public void turnRandomStepToLook() {
@@ -380,7 +408,7 @@ public class LearningStrategy implements Comparable<LearningStrategy>{
 		{
 			stepIndex = SeededRandom.rnd.nextInt(strategy.size());
 		}
-		strategy.set(stepIndex, new WalkStep());
+		strategy.set(stepIndex, new AscendIfLookedHigherElseRandom());
 	}
 	
 	public double getFitnessAtStep(int step) {

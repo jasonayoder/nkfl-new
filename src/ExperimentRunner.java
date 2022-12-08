@@ -98,7 +98,7 @@ public class ExperimentRunner {
 		ArrayList<Step> pureWalk = new ArrayList<Step>();
 		for(int i = 0; i < strategyLength; i++)
 		{
-			pureWalk.add(new WalkStep());
+			pureWalk.add(new AscendIfLookedHigherElseRandom());
 		}
 		strats.put("PureWalk", pureWalk);
 		
@@ -116,17 +116,17 @@ public class ExperimentRunner {
 		
 		while(alternateLookWalk.size() + looksperwalka*2 + 3 < strategyLength)
 		{
-			alternateLookWalk.add(new WalkStep());
+			alternateLookWalk.add(new AscendIfLookedHigherElseRandom());
 			for(int j = 0; j < looksperwalka; j++)
 			{
 				alternateLookWalk.add(new LookStep());
 			}
-			alternateLookWalk.add(new WalkStep());
+			alternateLookWalk.add(new AscendIfLookedHigherElseRandom());
 			for(int j = 0; j < looksperwalka; j++)
 			{
 				alternateLookWalk.add(new LookStep());
 			}
-			alternateLookWalk.add(new WalkStep());
+			alternateLookWalk.add(new AscendIfLookedHigherElseRandom());
 			
 		}
 		strats.put("AlternateLookWalk", alternateLookWalk);
@@ -140,7 +140,7 @@ public class ExperimentRunner {
 			{
 				SHC.add(new LookStep());
 			}
-			SHC.add(new WalkStep());
+			SHC.add(new AscendIfLookedHigherElseRandom());
 		}
 		strats.put("Steep Hill Climb", SHC);
 		
@@ -155,7 +155,7 @@ public class ExperimentRunner {
 				{
 					balanced.add(new LookStep());
 				}
-				balanced.add(new WalkStep());
+				balanced.add(new AscendIfLookedHigherElseRandom());
 			}
 			
 			strats.put("Balanced", balanced);

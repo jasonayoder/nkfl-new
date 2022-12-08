@@ -122,7 +122,7 @@ public class EvolutionSimulation {
 			int[][] counts = new int[strategyLength][3]; //TODO: Update when new steps are added or update to be dynamic
 			for(LearningStrategy ls: generations.get(gen).strategies) {
 				for(int i = 0; i<strategyLength; i++) {
-					if(ls.strategy.get(i) instanceof WalkStep) {
+					if(ls.strategy.get(i) instanceof AscendIfLookedHigherElseRandom) {
 						counts[i][0]++;
 					}else if(ls.strategy.get(i) instanceof LookStep) {
 						counts[i][1]++;
@@ -173,9 +173,9 @@ public class EvolutionSimulation {
 			double[] avgFitnesses = new double[strategyLength];
 			for(LearningStrategy ls : generations.get(gen).strategies) {
 				for(int i = 0; i<strategyLength; i++) {
-					if(ls.strategy.get(i) instanceof WalkStep) {
+					if(ls.strategy.get(i) instanceof AscendIfLookedHigherElseRandom) {
 						probs[i]++;
-						if(i>0&&(ls.strategy.get(i-1) instanceof WalkStep)) {
+						if(i>0&&(ls.strategy.get(i-1) instanceof AscendIfLookedHigherElseRandom)) {
 							randProbs[i]++;
 						}
 					}

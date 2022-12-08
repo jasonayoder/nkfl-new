@@ -47,7 +47,7 @@ class Tests_LearningStrategy {
 		
 		for(int i = 0; i < 15; i++)
 		{
-			strategy.add(new WalkStep());
+			strategy.add(new AscendIfLookedHigherElseRandom());
 		}
 		int startingLocation = 0;//{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		
@@ -93,7 +93,7 @@ class Tests_LearningStrategy {
 		{
 			strategy.add(new LookStep());
 		}
-		strategy.add(new WalkStep());
+		strategy.add(new AscendIfLookedHigherElseRandom());
 		
 		int startingLocation = 0; //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		
@@ -118,7 +118,7 @@ class Tests_LearningStrategy {
 		for(int i = 0; i < 5; i++)
 		{
 			strategy.add(new LookStep());
-			strategy.add(new WalkStep());
+			strategy.add(new AscendIfLookedHigherElseRandom());
 		}
 		
 		int startingLocation = 0;//{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
