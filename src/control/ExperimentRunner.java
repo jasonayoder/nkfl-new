@@ -24,7 +24,7 @@ public class ExperimentRunner {
 	
 	
 	public static void main(String[] args) {
-		String filename = "configFiles/config.properties";
+		String filename = "configFiles/config2.properties";
 		if(args.length == 1)
 		{
 			filename = args[0];
