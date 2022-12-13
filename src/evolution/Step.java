@@ -9,34 +9,26 @@ import control.Constants;
 import seededrandom.SeededRandom;
 
 public enum Step {
-	RandomWalk, SteepestClimb, SteepestFall, RandomIfMaximaElseSteepestClimb, RandomIfMinimaElseSteepestFall;
+	RandomWalk, SteepestClimb, SteepestFall, SameStep, OppositeStep, RandomIfMaximaElseSteepestClimb, RandomIfMinimaElseSteepestFall;
 	
 	private static final List<Step> VALUES =
 			Collections.unmodifiableList(Arrays.asList(values()));
 	private static final int SIZE = VALUES.size();
 	
 	private static List<Step> getValidSteps() {
+		if(Constants.BLOCK_STEPS.charAt(Constants.BLOCK_STEPS.length()-1) != ',' || Constants.BLOCK_STEPS.charAt(0) != ',')
+		{
+			System.out.println("Please append a , to the beginning and end of blockSteps paramater, I cannot ensure all blocks are correctly added otherwise");
+		}
+		
 		List<Step> validSteps = new ArrayList<Step>();
 		
-		if(Constants.BLOCK_STEPS.contains("RandomWalk"))
+		for(Step s : VALUES)
 		{
-			validSteps.add(RandomWalk);
-		}
-		if(Constants.BLOCK_STEPS.contains("SteepestClimb"))
-		{
-			validSteps.add(SteepestClimb);
-		}
-		if(Constants.BLOCK_STEPS.contains("SteepestFall"))
-		{
-			validSteps.add(SteepestFall);
-		}
-		if(Constants.BLOCK_STEPS.contains("RandomIfMaximaElseSteepestClimb"))
-		{
-			validSteps.add(RandomIfMaximaElseSteepestClimb);
-		}
-		if(Constants.BLOCK_STEPS.contains("RandomIfMinimaElseSteepestFall"))
-		{
-			validSteps.add(RandomIfMinimaElseSteepestFall);
+			if(Constants.BLOCK_STEPS.contains(',' + s.name() + ','))
+			{
+				validSteps.add(s);
+			}
 		}
 		return validSteps;
 	}
@@ -48,4 +40,18 @@ public enum Step {
 	}
 	
 	
+	public static Step getOppositeOfStep(Step s) {
+		switch(s) {
+			case RandomWalk:
+				return SteepestClimb;
+			case SteepestClimb:
+				return SteepestFall;
+			case SteepestFall:
+				return SteepestClimb;
+			default:
+				System.out.println("getOppositeOfStep not implemented for given step");
+				return null;//Opposite is not implemented for the step given
+		}
+		
+	}
 }

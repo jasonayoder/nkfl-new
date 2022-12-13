@@ -33,6 +33,7 @@ public class Agent implements Comparable<Agent>{
 	
 	private Integer[] developmentalProgram;
 	private HashMap<Integer, ArrayList<Step>> blockStepsMap;
+	private Step[] stepsExecuted;
 	
 	public double[] fitnessArray; //fitnesses at each step
 	public FitnessLandscape landscape; // This LearningStrategy's NKFL
@@ -184,33 +185,11 @@ public class Agent implements Comparable<Agent>{
 		{
 			for(Step step : blockStepsMap.get(block))
 			{
-				//Just a note, this switch doesn't check if steps are included, that should be managed
-				//by setupStrategy() and anything that manages mutation
-				switch(step) {
-					case RandomWalk:
-						//walk randomly
-						randomWalk(phenotypeArray);
-						break;
-					case SteepestClimb:
-						//climb steeply
-						steepestClimb(phenotypeArray);
-						break;
-					case SteepestFall:
-						//fall steeply
-						steepestFall(phenotypeArray);
-						break;
-					case RandomIfMinimaElseSteepestFall:
-						randomIfMinimaElseSteepestFall(phenotypeArray);
-						break;
-					case RandomIfMaximaElseSteepestClimb:
-						randomIfMaximaElseSteepestClimb(phenotypeArray);
-						break;
-					default:
-						System.out.println("Step not recognized: " + step);
-						break;
-				}
+				executeStep(step, phenotypeArray, stepIndex);
 				
 				stepIndex = stepIndex + 1;
+				//We update fitnessArray after because of step 0, which is the fitness before we ever moved
+				//So the fitness after step i is at fitnessArray[stepIndex + 1]
 				fitnessArray[stepIndex] = landscape.fitness(phenotype);
 				
 				//Comment this out to run more efficiently.  Just a sanity check to make sure phenotypeArray works
@@ -219,6 +198,54 @@ public class Agent implements Comparable<Agent>{
 					System.out.println("Phenotype Error");
 				}
 			}
+		}
+	}
+	
+	/**
+	 * Home of the big switch statement
+	 * 
+	 * We pass stepIndex for same and opposite-esque steps, as well as logging to stepsExecuted
+	 *
+	 */
+	private void executeStep(Step step, int[] phenotypeArray, int stepIndex)
+	{
+		//Just a note, this switch doesn't check if steps are included, that should be managed
+		//by setupStrategy() and anything that manages mutation
+		switch(step) {
+			case RandomWalk:
+				//walk randomly
+				randomWalk(phenotypeArray);
+				stepsExecuted[stepIndex] = Step.RandomWalk;
+				break;
+			case SteepestClimb:
+				//climb steeply
+				steepestClimb(phenotypeArray);
+				stepsExecuted[stepIndex] = Step.SteepestClimb;
+				break;
+			case SteepestFall:
+				//fall steeply
+				steepestFall(phenotypeArray);
+				stepsExecuted[stepIndex] = Step.SteepestFall;
+				break;
+			case RandomIfMinimaElseSteepestFall:
+				randomIfMinimaElseSteepestFall(phenotypeArray);
+				stepsExecuted[stepIndex] = null; //I am not sure how you want this implemented
+				break;
+			case RandomIfMaximaElseSteepestClimb:
+				randomIfMaximaElseSteepestClimb(phenotypeArray);
+				stepsExecuted[stepIndex] = null; //I am not sure how you want this implemented
+				break;
+			case SameStep:
+				sameStep(phenotypeArray, stepIndex);
+				//Do not modify stepsExecuted.  sameStep re-calls executeStep, which should then use another case to do so.
+				break;
+			case OppositeStep:
+				oppositeStep(phenotypeArray, stepIndex);
+				//Do not modify stepsExecuted.  sameStep re-calls executeStep, which should then use another case to do so.
+				break;
+			default:
+				System.out.println("Step not recognized: " + step);
+				break;
 		}
 	}
 	
@@ -236,6 +263,7 @@ public class Agent implements Comparable<Agent>{
 	{
 		this.fitnessArray = new double[Constants.TOTAL_LENGTH+1]; //The +1 accounts for recording the initial fitness
 		double[] compoundFitnessArray = new double[fitnessArray.length];
+		this.stepsExecuted = new Step[Constants.TOTAL_LENGTH];//Note for future - does this make sense for nondeterministic strategies?
 		
 		for(int sample=0; sample < Constants.SAMPLES_PER_RUN; sample++)
 		{
@@ -334,6 +362,32 @@ public class Agent implements Comparable<Agent>{
 			return;
 		}
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
+	}
+	/**
+	 * @param phenotypeArray
+	 * @param stepIndex
+	 */
+	private void sameStep(int[] phenotypeArray, int stepIndex)
+	{
+		if(stepIndex == 0)
+		{
+			executeStep(Step.RandomWalk, phenotypeArray, stepIndex);
+		}
+		else
+		{
+			executeStep(stepsExecuted[stepIndex-1], phenotypeArray, stepIndex);
+		}
+	}
+	private void oppositeStep(int[] phenotypeArray, int stepIndex)
+	{
+		if(stepIndex == 0)
+		{
+			executeStep(Step.RandomWalk, phenotypeArray, stepIndex);
+		}
+		else
+		{
+			executeStep(Step.getOppositeOfStep(stepsExecuted[stepIndex-1]), phenotypeArray, stepIndex);
+		}
 	}
 	
 //	private void sameAction(int[] phenotypeArray) {
