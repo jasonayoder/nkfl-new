@@ -35,6 +35,8 @@ public class Constants {
 	public static final double PROGRAM_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("programMutationRate"));
 	public static final double BLOCK_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("blockMutationRate"));
 	public static final double GENOTYPE_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("genotypeMutationRate"));
+	public static final double BLOCK_OVERWRITE_ANY = Double.parseDouble(PropParser.getProperty("blockOverwriteAny"));
+	public static final double BLOCK_OVERWRITE_UNUSED = Double.parseDouble(PropParser.getProperty("blockOverwriteUnused"));
 	
 	public static final int SEED = Integer.parseInt(PropParser.getProperty("seed"));
 	

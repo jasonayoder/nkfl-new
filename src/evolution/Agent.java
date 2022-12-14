@@ -33,7 +33,7 @@ public class Agent implements Comparable<Agent>{
 	
 	private Integer[] developmentalProgram;
 	private HashMap<Integer, ArrayList<Step>> blockStepsMap;
-	private Step[] stepsExecuted;
+	private ArrayList<Step> stepsExecuted;
 	
 	public double[] fitnessArray; //fitnesses at each step
 	public FitnessLandscape landscape; // This LearningStrategy's NKFL
@@ -185,7 +185,7 @@ public class Agent implements Comparable<Agent>{
 		{
 			for(Step step : blockStepsMap.get(block))
 			{
-				executeStep(step, phenotypeArray, stepIndex);
+				executeStep(step, phenotypeArray);
 				
 				stepIndex = stepIndex + 1;
 				//We update fitnessArray after because of step 0, which is the fitness before we ever moved
@@ -204,10 +204,9 @@ public class Agent implements Comparable<Agent>{
 	/**
 	 * Home of the big switch statement
 	 * 
-	 * We pass stepIndex for same and opposite-esque steps, as well as logging to stepsExecuted
 	 *
 	 */
-	private void executeStep(Step step, int[] phenotypeArray, int stepIndex)
+	private void executeStep(Step step, int[] phenotypeArray)
 	{
 		//Just a note, this switch doesn't check if steps are included, that should be managed
 		//by setupStrategy() and anything that manages mutation
@@ -215,32 +214,27 @@ public class Agent implements Comparable<Agent>{
 			case RandomWalk:
 				//walk randomly
 				randomWalk(phenotypeArray);
-				stepsExecuted[stepIndex] = Step.RandomWalk;
 				break;
 			case SteepestClimb:
 				//climb steeply
 				steepestClimb(phenotypeArray);
-				stepsExecuted[stepIndex] = Step.SteepestClimb;
 				break;
 			case SteepestFall:
 				//fall steeply
 				steepestFall(phenotypeArray);
-				stepsExecuted[stepIndex] = Step.SteepestFall;
 				break;
 			case RandomIfMinimaElseSteepestFall:
 				randomIfMinimaElseSteepestFall(phenotypeArray);
-				stepsExecuted[stepIndex] = null; //I am not sure how you want this implemented
 				break;
 			case RandomIfMaximaElseSteepestClimb:
 				randomIfMaximaElseSteepestClimb(phenotypeArray);
-				stepsExecuted[stepIndex] = null; //I am not sure how you want this implemented
 				break;
 			case SameStep:
-				sameStep(phenotypeArray, stepIndex);
+				sameStep(phenotypeArray);
 				//Do not modify stepsExecuted.  sameStep re-calls executeStep, which should then use another case to do so.
 				break;
 			case OppositeStep:
-				oppositeStep(phenotypeArray, stepIndex);
+				oppositeStep(phenotypeArray);
 				//Do not modify stepsExecuted.  sameStep re-calls executeStep, which should then use another case to do so.
 				break;
 			default:
@@ -261,14 +255,13 @@ public class Agent implements Comparable<Agent>{
 	 */
 	public double executeStrategy()
 	{
-		this.fitnessArray = new double[Constants.TOTAL_LENGTH+1]; //The +1 accounts for recording the initial fitness
-		double[] compoundFitnessArray = new double[fitnessArray.length];
-		this.stepsExecuted = new Step[Constants.TOTAL_LENGTH];//Note for future - does this make sense for nondeterministic strategies?
+		double[] compoundFitnessArray = new double[Constants.TOTAL_LENGTH+1]; //The +1 accounts for recording the initial fitness
 		
 		for(int sample=0; sample < Constants.SAMPLES_PER_RUN; sample++)
 		{
 			phenotype = genotype;
 			phenotypeFitness = genotypeFitness;
+			this.stepsExecuted = new ArrayList<Step>();//Note for future - does this make sense for nondeterministic strategies?
 			fitnessArray = new double[compoundFitnessArray.length];
 			
 			executeSingleStrategy();
@@ -319,11 +312,13 @@ public class Agent implements Comparable<Agent>{
 	{
 		int index = SeededRandom.rnd.nextInt(phenotypeArray.length);
 		flipPhenotypeAndArray(index, phenotypeArray);
+		stepsExecuted.add(Step.RandomWalk);
 	}
 	
 	private void steepestClimb(int[] phenotypeArray)
 	{
 		int locationDiff = landscape.greatestNeighborBit(phenotype);
+		stepsExecuted.add(Step.SteepestClimb);
 		if(locationDiff==-1)
 		{
 			//we're at a local optima
@@ -335,6 +330,7 @@ public class Agent implements Comparable<Agent>{
 	private void steepestFall(int[] phenotypeArray)
 	{
 		int locationDiff = landscape.leastNeighborBit(phenotype);
+		stepsExecuted.add(Step.SteepestFall);
 		if(locationDiff==-1)
 		{
 			//we're at a local optima
@@ -365,28 +361,27 @@ public class Agent implements Comparable<Agent>{
 	}
 	/**
 	 * @param phenotypeArray
-	 * @param stepIndex
 	 */
-	private void sameStep(int[] phenotypeArray, int stepIndex)
+	private void sameStep(int[] phenotypeArray)
 	{
-		if(stepIndex == 0)
+		if(stepsExecuted.size() == 0)
 		{
-			executeStep(Step.RandomWalk, phenotypeArray, stepIndex);
+			executeStep(Step.RandomWalk, phenotypeArray);
 		}
 		else
 		{
-			executeStep(stepsExecuted[stepIndex-1], phenotypeArray, stepIndex);
+			executeStep(stepsExecuted.get(stepsExecuted.size()-1), phenotypeArray);
 		}
 	}
-	private void oppositeStep(int[] phenotypeArray, int stepIndex)
+	private void oppositeStep(int[] phenotypeArray)
 	{
-		if(stepIndex == 0)
+		if(stepsExecuted.size() == 0)
 		{
-			executeStep(Step.RandomWalk, phenotypeArray, stepIndex);
+			executeStep(Step.RandomWalk, phenotypeArray);
 		}
 		else
 		{
-			executeStep(Step.getOppositeOfStep(stepsExecuted[stepIndex-1]), phenotypeArray, stepIndex);
+			executeStep(Step.getOppositeOfStep(stepsExecuted.get(stepsExecuted.size()-1)), phenotypeArray);
 		}
 	}
 	
@@ -496,6 +491,54 @@ public class Agent implements Comparable<Agent>{
 				if(roll < Constants.PROGRAM_MUTATION_RATE)
 				{
 					developmentalProgram[programStep] = SeededRandom.rnd.nextInt(Constants.BLOCKS);
+				}
+			}
+		}
+		
+		if(Constants.BLOCK_OVERWRITE_ANY > 0)
+		{
+			for(int block=0; block<Constants.BLOCKS; block++)
+			{
+				double roll = SeededRandom.rnd.nextDouble();
+				if(roll < Constants.BLOCK_OVERWRITE_ANY)
+				{
+					int blockToCopy = SeededRandom.rnd.nextInt(0, Constants.BLOCKS);//yeah it can roll the same one, but that's not an issue
+					ArrayList<Step> copied = new ArrayList<Step>();
+					for(Step s : blockStepsMap.get(blockToCopy))//We do this to make sure it is a new arraylist, don't want them to be dependent on each other
+					{
+						copied.add(s);
+					}
+					blockStepsMap.put(block, copied);
+				}
+			}
+		}
+		
+		if(Constants.BLOCK_OVERWRITE_UNUSED > 0)
+		{
+			ArrayList<Integer> usedBlocks = new ArrayList<Integer>();
+			for(Integer i : developmentalProgram)
+			{
+				if(!usedBlocks.contains(i))//If you comment out this if, it becomes proportional to how much it is used.
+				{
+					usedBlocks.add(i);
+				}
+			}
+			for(int block=0; block<Constants.BLOCKS; block++)
+			{
+				if(usedBlocks.contains(block))
+				{
+					continue;
+				}
+				double roll = SeededRandom.rnd.nextDouble();
+				if(roll < Constants.BLOCK_OVERWRITE_UNUSED)
+				{
+					int blockToCopy = usedBlocks.get(SeededRandom.rnd.nextInt(usedBlocks.size()));//yeah it can roll the same one, but that's not an issue
+					ArrayList<Step> copied = new ArrayList<Step>();
+					for(Step s : blockStepsMap.get(blockToCopy))//We do this to make sure it is a new arraylist, don't want them to be dependent on each other
+					{
+						copied.add(s);
+					}
+					blockStepsMap.put(block, copied);
 				}
 			}
 		}

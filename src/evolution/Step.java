@@ -39,7 +39,14 @@ public enum Step {
 		return validSteps.get(SeededRandom.rnd.nextInt(validSteps.size()));
 	}
 	
-	
+	/***
+	 * This is where opposites are defined for the OppositeStep's use.
+	 * Someday it may make sense to replace this with a map, but for
+	 * now it's just a static method on Step.
+	 * 
+	 * @param s
+	 * @return opposite step of s
+	 */
 	public static Step getOppositeOfStep(Step s) {
 		switch(s) {
 			case RandomWalk:
