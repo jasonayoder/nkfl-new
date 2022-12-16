@@ -9,7 +9,7 @@ import control.Constants;
 import seededrandom.SeededRandom;
 
 public enum Step {
-	RandomWalk, SteepestClimb, SteepestFall, SameStep, OppositeStep, RandomIfMaximaElseSteepestClimb, RandomIfMinimaElseSteepestFall;
+	RandomWalk, SteepestClimb, SteepestFall, SameStep, OppositeStep, RandomIfMaximaElseSteepestClimb, RandomIfMinimaElseSteepestFall, ReturnToMaxima, ReturnToMinima, Wait, SameAction, OppositeAction;
 	
 	private static final List<Step> VALUES =
 			Collections.unmodifiableList(Arrays.asList(values()));
@@ -50,11 +50,29 @@ public enum Step {
 	public static Step getOppositeOfStep(Step s) {
 		switch(s) {
 			case RandomWalk:
-				return SteepestClimb;
+				return Wait;
 			case SteepestClimb:
 				return SteepestFall;
 			case SteepestFall:
 				return SteepestClimb;
+			case SameStep:
+				return OppositeStep;
+			case OppositeStep:
+				return SameStep;
+			case RandomIfMaximaElseSteepestClimb:
+				return RandomIfMinimaElseSteepestFall;
+			case RandomIfMinimaElseSteepestFall:
+				return RandomIfMaximaElseSteepestClimb;
+			case ReturnToMaxima:
+				return ReturnToMinima;
+			case ReturnToMinima:
+				return ReturnToMaxima;
+			case Wait:
+				return RandomWalk;
+			case SameAction:
+				return OppositeAction;
+			case OppositeAction:
+				return SameAction;
 			default:
 				System.out.println("getOppositeOfStep not implemented for given step");
 				return null;//Opposite is not implemented for the step given

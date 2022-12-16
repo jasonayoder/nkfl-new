@@ -34,8 +34,11 @@ public class Agent implements Comparable<Agent>{
 	private Integer[] developmentalProgram;
 	private HashMap<Integer, ArrayList<Step>> blockStepsMap;
 	private ArrayList<Step> stepsExecuted;
+	private ArrayList<Step> actionsExecuted;
 	
 	public double[] fitnessArray; //fitnesses at each step
+	public int maxPhenotype;
+	public int minPhenotype;
 	public FitnessLandscape landscape; // This LearningStrategy's NKFL
 	
 	public int phenotype; //
@@ -177,7 +180,8 @@ public class Agent implements Comparable<Agent>{
 		{
 			System.err.println("Error 2-decomposing genotype");
 		}
-		
+		maxPhenotype = genotype;
+		minPhenotype = genotype;
 		int stepIndex = 0;
 		fitnessArray[stepIndex] = landscape.fitness(genotype);
 		//actually execute our strategy
@@ -191,11 +195,23 @@ public class Agent implements Comparable<Agent>{
 				//We update fitnessArray after because of step 0, which is the fitness before we ever moved
 				//So the fitness after step i is at fitnessArray[stepIndex + 1]
 				fitnessArray[stepIndex] = landscape.fitness(phenotype);
+				if(landscape.fitness(phenotype)>landscape.fitness(maxPhenotype)) {
+					maxPhenotype=phenotype;
+				}
+				if(landscape.fitness(phenotype)<landscape.fitness(minPhenotype)) {
+					minPhenotype=phenotype;
+				}
 				
 				//Comment this out to run more efficiently.  Just a sanity check to make sure phenotypeArray works
 				if(!ensurePheontypeConsistency(phenotypeArray))
 				{
-					System.out.println("Phenotype Error");
+					System.out.println("Phenotype Error:");
+					for(int i = landscape.n-1; i>=0; i--) {
+						System.out.print(phenotypeArray[i]);
+					}
+					System.out.println();
+					System.out.println(phenotype);
+					System.out.println(Integer.toBinaryString(phenotype));
 				}
 			}
 		}
@@ -237,6 +253,21 @@ public class Agent implements Comparable<Agent>{
 				oppositeStep(phenotypeArray);
 				//Do not modify stepsExecuted.  sameStep re-calls executeStep, which should then use another case to do so.
 				break;
+			case ReturnToMaxima:
+				returnToMaxima(phenotypeArray);
+				break;
+			case ReturnToMinima:
+				returnToMinima(phenotypeArray);
+				break;
+			case SameAction:
+				sameAction(phenotypeArray);
+				break;
+			case OppositeAction:
+				oppositeAction(phenotypeArray);
+				break;
+			case Wait:
+				wait(phenotypeArray);
+				break;
 			default:
 				System.out.println("Step not recognized: " + step);
 				break;
@@ -262,6 +293,7 @@ public class Agent implements Comparable<Agent>{
 			phenotype = genotype;
 			phenotypeFitness = genotypeFitness;
 			this.stepsExecuted = new ArrayList<Step>();//Note for future - does this make sense for nondeterministic strategies?
+			this.actionsExecuted = new ArrayList<Step>();
 			fitnessArray = new double[compoundFitnessArray.length];
 			
 			executeSingleStrategy();
@@ -306,19 +338,19 @@ public class Agent implements Comparable<Agent>{
 		return calculatedPhenotype == phenotype;
 	}
 	
-//	private boolean random,climb,fall = false;
-	
 	private void randomWalk(int[] phenotypeArray)
 	{
 		int index = SeededRandom.rnd.nextInt(phenotypeArray.length);
 		flipPhenotypeAndArray(index, phenotypeArray);
 		stepsExecuted.add(Step.RandomWalk);
+		actionsExecuted.add(Step.RandomWalk);
 	}
 	
 	private void steepestClimb(int[] phenotypeArray)
 	{
 		int locationDiff = landscape.greatestNeighborBit(phenotype);
 		stepsExecuted.add(Step.SteepestClimb);
+		actionsExecuted.add(Step.SteepestClimb);
 		if(locationDiff==-1)
 		{
 			//we're at a local optima
@@ -331,6 +363,7 @@ public class Agent implements Comparable<Agent>{
 	{
 		int locationDiff = landscape.leastNeighborBit(phenotype);
 		stepsExecuted.add(Step.SteepestFall);
+		actionsExecuted.add(Step.SteepestFall);
 		if(locationDiff==-1)
 		{
 			//we're at a local optima
@@ -342,21 +375,29 @@ public class Agent implements Comparable<Agent>{
 	private void randomIfMinimaElseSteepestFall(int[] phenotypeArray)
 	{
 		int locationDiff = landscape.leastNeighborBit(phenotype);
+		stepsExecuted.add(Step.RandomIfMaximaElseSteepestClimb);
 		if(locationDiff==-1)
 		{
-			randomWalk(phenotypeArray);
+			int index = SeededRandom.rnd.nextInt(phenotypeArray.length);
+			flipPhenotypeAndArray(index, phenotypeArray);
+			actionsExecuted.add(Step.RandomWalk);
 			return;
 		}
+		actionsExecuted.add(Step.SteepestFall);
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
 	}
 	private void randomIfMaximaElseSteepestClimb(int[] phenotypeArray)
 	{
 		int locationDiff = landscape.greatestNeighborBit(phenotype);
+		stepsExecuted.add(Step.RandomIfMaximaElseSteepestClimb);
 		if(locationDiff==-1)
 		{
-			randomWalk(phenotypeArray);
+			int index = SeededRandom.rnd.nextInt(phenotypeArray.length);
+			flipPhenotypeAndArray(index, phenotypeArray);
+			actionsExecuted.add(Step.RandomWalk);
 			return;
 		}
+		actionsExecuted.add(Step.SteepestClimb);
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
 	}
 	/**
@@ -384,13 +425,76 @@ public class Agent implements Comparable<Agent>{
 			executeStep(Step.getOppositeOfStep(stepsExecuted.get(stepsExecuted.size()-1)), phenotypeArray);
 		}
 	}
+	private void wait(int[] phenotypeArray) {
+		stepsExecuted.add(Step.Wait);
+		actionsExecuted.add(Step.Wait);
+	}
 	
-//	private void sameAction(int[] phenotypeArray) {
-//		if(random) {
-//			randomWalk(phenotype);
-//			return; 
-//		}
-//	}
+	private void sameAction(int[] phenotypeArray)
+	{
+		if(actionsExecuted.size() == 0)
+		{
+			executeStep(Step.RandomWalk, phenotypeArray);
+		}
+		else
+		{
+			executeStep(actionsExecuted.get(actionsExecuted.size()-1), phenotypeArray);
+		}
+	}
+	private void oppositeAction(int[] phenotypeArray)
+	{
+		if(actionsExecuted.size() == 0)
+		{
+			executeStep(Step.RandomWalk, phenotypeArray);
+		}
+		else
+		{
+			executeStep(Step.getOppositeOfStep(actionsExecuted.get(stepsExecuted.size()-1)), phenotypeArray);
+		}
+	}
+	
+	
+	private void returnToMaxima(int[] phenotypeArray) {
+		//Copy pasted from above to ensure consistency, some code duplication....D:
+		phenotype = maxPhenotype;
+		int genotypeTracker = phenotype;
+		//The reason we gain efficiency doing it all at once is because we would have to do this
+		//power-of-2 decomposition every single step otherwise
+		for(int i=landscape.n-1; i>=0; i--)
+		{
+			phenotypeArray[i]=0;
+			if(genotypeTracker >= Math.pow(2, i))
+			{
+				phenotypeArray[i]=1;
+				genotypeTracker -= Math.pow(2, i);
+			}
+		}
+		if(genotypeTracker != 0)//Remove this check eventually if we feel confident
+		{
+			System.err.println("Error 2-decomposing genotype");
+		}
+	}
+	
+	private void returnToMinima(int[] phenotypeArray) {
+		//Copy pasted from above to ensure consistency, some code duplication....D:
+		phenotype = minPhenotype;
+		int genotypeTracker = phenotype;
+		//The reason we gain efficiency doing it all at once is because we would have to do this
+		//power-of-2 decomposition every single step otherwise
+		for(int i=landscape.n-1; i>=0; i--)
+		{
+			phenotypeArray[i]=0;
+			if(genotypeTracker >= Math.pow(2, i))
+			{
+				phenotypeArray[i]=1;
+				genotypeTracker -= Math.pow(2, i);
+			}
+		}
+		if(genotypeTracker != 0)//Remove this check eventually if we feel confident
+		{
+			System.err.println("Error 2-decomposing genotype");
+		}
+	}
 	
 	private void flipPhenotypeAndArray(int index, int[] phenotypeArray)
 	{
@@ -502,7 +606,7 @@ public class Agent implements Comparable<Agent>{
 				double roll = SeededRandom.rnd.nextDouble();
 				if(roll < Constants.BLOCK_OVERWRITE_ANY)
 				{
-					int blockToCopy = SeededRandom.rnd.nextInt(0, Constants.BLOCKS);//yeah it can roll the same one, but that's not an issue
+					int blockToCopy = SeededRandom.rnd.nextInt(Constants.BLOCKS);//yeah it can roll the same one, but that's not an issue
 					ArrayList<Step> copied = new ArrayList<Step>();
 					for(Step s : blockStepsMap.get(blockToCopy))//We do this to make sure it is a new arraylist, don't want them to be dependent on each other
 					{
@@ -585,6 +689,21 @@ public class Agent implements Comparable<Agent>{
 		return stringArray;
 	}
 	
+	public Step[] totalStrategyStepArray()
+	{
+		Step[] stringArray = new Step[Constants.TOTAL_LENGTH];
+		int stepIndex = 0;
+		//actually execute our strategy
+		for(Integer block : developmentalProgram)
+		{
+			for(Step step : blockStepsMap.get(block))
+			{
+				stringArray[stepIndex] = step;
+				stepIndex++;
+			}
+		}
+		return stringArray;
+	}
 	
 	/**
 	 * Compares fitness for sorting
