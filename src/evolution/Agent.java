@@ -30,6 +30,7 @@ import seededrandom.SeededRandom;
  */
 public class Agent implements Comparable<Agent>{
 	//Data needed to function
+	private Agent parent = null;
 	
 	private Integer[] developmentalProgram;
 	private HashMap<Integer, ArrayList<Step>> blockStepsMap;
@@ -69,7 +70,7 @@ public class Agent implements Comparable<Agent>{
 	}
 	
 	//This constructor is specially build for making children
-	public Agent(FitnessLandscape landscape, int genotype, Integer[] developmentalProgram, HashMap<Integer, ArrayList<Step>> blockSteps)
+	public Agent(FitnessLandscape landscape, int genotype, Integer[] developmentalProgram, HashMap<Integer, ArrayList<Step>> blockSteps, Agent parent)
 	{
 		//no other constructor calls because we don't want to call setupStrategy
 		this.landscape = landscape;
@@ -79,6 +80,7 @@ public class Agent implements Comparable<Agent>{
 		this.phenotypeFitness = genotypeFitness;
 		this.developmentalProgram = developmentalProgram;
 		this.blockStepsMap = blockSteps;
+		this.parent = parent;
 	}
 	
 	private void setupStrategy() {
@@ -536,7 +538,7 @@ public class Agent implements Comparable<Agent>{
 			newBS.put(bs, a);
 		}
 		
-		return new Agent(landscape, genotype, newDP, newBS);
+		return new Agent(landscape, genotype, newDP, newBS, this);
 	}
 	
 	public void mutate()

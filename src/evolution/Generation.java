@@ -150,6 +150,26 @@ public class Generation {
 		return new Generation(nextGeneration);
 	}
 	
+//	public Generation getNextGenerationFitnessProportionate()
+//	{
+//		this.sortStrategies();
+//		ArrayList<Agent> nextGeneration = new ArrayList<Agent>();
+//		
+//		
+//		
+//		
+//		return new Generation(nextGeneration);
+//	}
+//	
+//	public Generation getNextGenerationRanked()
+//	{
+//		this.sortStrategies();
+//		ArrayList<Agent> nextGeneration = new ArrayList<Agent>();
+//		
+//		
+//		return new Generation(nextGeneration);
+//	}
+	
 	//The code sorts it so that the best strategies are first
 	public void sortStrategies() {
 		Collections.sort(strategies);
