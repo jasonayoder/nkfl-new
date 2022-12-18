@@ -14,18 +14,19 @@ import statistics
 
 cmaps=OrderedDict()
 #ask the user to sleect the folder containing the experiments
-directory = 'C:/Users/jacob/git/nkfl-new/pythonGrapher/directoryGrapher/toGraph'#It's nice to hardcode this value if you're making a lot of graphs
+# #It's nice to hardcode this value if you're making a lot of graphs
 # directory = askdirectory()
-print(directory)
+# print(directory)
 
 #Someday make it extract these from the .csv
 topGen = '200'
 genInc = '5'
 stratlen = 50
 
+filename = askopenfilename()
 
-filenames = []
-dicts = []
+filenames = "filename"
+dict = {}
 files = []
 
 for file in sorted(os.listdir(directory)):
