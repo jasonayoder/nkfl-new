@@ -13,6 +13,8 @@ public class Constants {
 	// Properties (user configurable)
 	public static final int PROGRAM_LENGTH = Integer.parseInt(PropParser.getProperty("programLength"));
 	public static final String COMPARISON_PROGRAM = PropParser.getProperty("comparisonProgram");
+	public static final String STARTING_GENERATION = PropParser.getProperty("startingGeneration");
+	public static final int STARTING_GENERATION_INDEX = Integer.parseInt(PropParser.getProperty("startingGenerationIndex"));
 	
 	public static final int BLOCKS = Integer.parseInt(PropParser.getProperty("blocks"));
 	public static final int BLOCK_LENGTH = Integer.parseInt(PropParser.getProperty("blockLength"));
@@ -32,6 +34,9 @@ public class Constants {
 	public static final int NUM_GENERATIONS = Integer.parseInt(PropParser.getProperty("numGenerations"));
 	public static final int GENERATION_SIZE = Integer.parseInt(PropParser.getProperty("generationSize"));
 	public static final int ELITISM = Integer.parseInt(PropParser.getProperty("elitism"));
+	public static final int TOURNAMENT_SIZE = Integer.parseInt(PropParser.getProperty("tournamentSize"));
+	
+	
 	public static final double PROGRAM_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("programMutationRate"));
 	public static final double BLOCK_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("blockMutationRate"));
 	public static final double GENOTYPE_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("genotypeMutationRate"));
@@ -43,6 +48,7 @@ public class Constants {
 	public static final int LANDSCAPES = Integer.parseInt(PropParser.getProperty("landscapes"));
 	public static final int RUNS_PER_LANDSCAPE = Integer.parseInt(PropParser.getProperty("runsPerLandscape"));
 	public static final boolean SINGLE_START = Boolean.parseBoolean(PropParser.getProperty("singleStart"));
+	public static final int STARTING_LOCATION = Integer.parseInt(PropParser.getProperty("startLocation"));
 	public static final int SAMPLES_PER_RUN = Integer.parseInt(PropParser.getProperty("samplesPerRun"));
 	
 	// Landscape Params
@@ -53,4 +59,5 @@ public class Constants {
 	//File Params
 	public static final String FILENAME = PropParser.getProperty("filename");
 	public static final int INCREMENT_CSV = Integer.parseInt(PropParser.getProperty("incrementCSVoutput"));
+	public static final boolean OUTPUT_GENSTR = Boolean.parseBoolean(PropParser.getProperty("outputGenstr"));
 } 

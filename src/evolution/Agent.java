@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import control.Constants;
@@ -189,6 +190,7 @@ public class Agent implements Comparable<Agent>{
 		//actually execute our strategy
 		for(Integer block : developmentalProgram)
 		{
+//			System.out.println(block);
 			for(Step step : blockStepsMap.get(block))
 			{
 				executeStep(step, phenotypeArray);
@@ -705,6 +707,74 @@ public class Agent implements Comparable<Agent>{
 			}
 		}
 		return stringArray;
+	}
+	
+	public String getStringRepresentation()
+	{
+		String sb = "";
+		
+		sb+=genotype + "_" + Constants.BLOCKS + "_";
+		
+		for(Integer step : developmentalProgram)
+		{
+			sb+=step + "|";
+		}
+		
+		
+		for(Integer key : blockStepsMap.keySet())
+		{
+			sb+="_";
+			sb+=key;
+			for(Step s : blockStepsMap.get(key))
+			{
+				sb+= "|" + s.name();
+			}
+		}
+		
+		return sb.toString().replace("RandomWalk", "RW").replace("SteepestFall", "SF").replace("SteepestClimb", "SC");
+	}
+	
+	public Agent(String stringrep, FitnessLandscape l)
+	{
+//		System.out.println(stringrep);
+		String[] sr = stringrep.replace("RW", "RandomWalk").replace("SF", "SteepestFall").replace("SC", "SteepestClimb").split("_");
+		this.landscape = l;
+		this.genotype = Integer.parseInt(sr[0]);
+		
+//		System.out.println(sr[2]);
+		String[] dpstring = sr[2].split("\\|");
+//		System.out.println(Arrays.toString(dpstring));
+		Integer[] dp = new Integer[dpstring.length];
+		for(int i=0; i<dpstring.length; i++)
+		{
+//			if(dp[i]==null)
+//			{
+//				continue;
+//			}
+//			System.out.println(dpstring[i]);
+//			System.out.println("aa");
+			dp[i] = Integer.parseInt(dpstring[i]);
+		}
+//		System.out.println(Arrays.toString(dp));
+		this.developmentalProgram = dp;
+		this.genotypeFitness = landscape.fitness(genotype);
+		this.phenotype = genotype;
+		this.phenotypeFitness = genotypeFitness;
+		this.blockStepsMap = new HashMap<Integer, ArrayList<Step>>();
+		
+		for(int blockindex = 3; blockindex < sr.length; blockindex++)
+		{
+			String[] blockstr = sr[blockindex].split("\\|");
+			int key = Integer.parseInt(blockstr[0]);
+			ArrayList<Step> block = new ArrayList<Step>();
+			for(int stepindex = 1; stepindex < blockstr.length; stepindex++)
+			{
+//				System.out.println(blockstr[stepindex]);
+				block.add(Step.getStepWithName(blockstr[stepindex]));
+			}
+//			System.out.println(block);
+			blockStepsMap.put(key, block);
+		}
 	}
 	
 	/**

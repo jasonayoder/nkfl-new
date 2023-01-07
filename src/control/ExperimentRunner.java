@@ -34,8 +34,18 @@ public class ExperimentRunner {
 	
 	public static void run(String configPath) {
 		PropParser.load(configPath);
+		long seed = 0;
 		
-		SeededRandom.rnd.setSeed(Constants.SEED);
+		if(Constants.SEED != -1)
+		{
+			SeededRandom.rnd.setSeed(Constants.SEED);
+			seed = Constants.SEED;
+		}
+		else
+		{
+			seed = SeededRandom.rnd.nextLong();
+			SeededRandom.rnd.setSeed(seed);//this line does nothing :P
+		}
 		
 		int tau = Integer.MAX_VALUE;
 		try{
@@ -44,9 +54,18 @@ public class ExperimentRunner {
 			System.out.println("generationsPerCycle not provided continuing with SOP");
 		}
 		
-		System.out.println(Constants.FILENAME);
+		String filename = Constants.FILENAME;
+		if(Constants.SEED == -1)
+		{
+			filename = filename + "_" + seed;
+		}
+		if(filename.contains("RENAME"))
+		{
+			filename = ""+SeededRandom.rnd.nextInt();
+		}
+		System.out.println(filename);
 		PrintWriter csvWriter;
-		File csvFile = new File(Constants.FILENAME);
+		File csvFile = new File(filename);
 
 		//Setup CSV writer
 		try {
@@ -74,7 +93,15 @@ public class ExperimentRunner {
 					{
 						long startTime = System.currentTimeMillis()/1000;
 						
-						EvolutionSimulation sim = new EvolutionSimulation(landscape, tau);
+						EvolutionSimulation sim = null;
+						if(Constants.STARTING_GENERATION.equals("NONE"))
+						{
+							sim = new EvolutionSimulation(landscape, tau);
+						}
+						else
+						{
+							sim = new EvolutionSimulation(landscape, tau, Constants.STARTING_GENERATION, Constants.STARTING_GENERATION_INDEX);
+						}
 						sim.runSimulation();
 						sim.writeExperimentToCSV(csvWriter);
 						
@@ -90,7 +117,7 @@ public class ExperimentRunner {
 		
 		//
 		
-		System.out.println("Data successfully written to " + Constants.FILENAME + ".csv");
+		System.out.println("Data successfully written to " + filename + ".csv");
 		
 		//cleanup
 		csvWriter.flush();

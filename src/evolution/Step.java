@@ -79,4 +79,16 @@ public enum Step {
 		}
 		
 	}
+	
+	public static Step getStepWithName(String name)
+	{
+		for(Step s : VALUES)
+		{
+			if(s.name().equals(name))
+			{
+				return s;
+			}
+		}
+		return null;
+	}
 }

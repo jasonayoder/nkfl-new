@@ -21,8 +21,14 @@ import seededrandom.SeededRandom;
  */
 public class Generation {
 	
-	public ArrayList<Agent> strategies = new ArrayList<Agent>();
+	public ArrayList<Agent> agents = new ArrayList<Agent>();
 	public FitnessLandscape landscape;
+	int startingLocation = -1;
+	
+	public Generation()//Makes a 'dummy generation'
+	{
+		
+	}
 	
 	/**
 	 * Declares a strategy generation with a given landscape, number of strategies,
@@ -36,7 +42,7 @@ public class Generation {
 		
 		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
 		{
-			strategies.add(new Agent(landscape));
+			agents.add(new Agent(landscape));
 		}
 	}
 	
@@ -46,7 +52,7 @@ public class Generation {
 		
 		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
 		{
-			strategies.add(new Agent(landscape, genotype));
+			agents.add(new Agent(landscape, genotype));
 		}
 	}
 	
@@ -57,7 +63,19 @@ public class Generation {
 	 */
 	public Generation(ArrayList<Agent> strategies)
 	{
-		this.strategies = strategies;
+		this.agents = strategies;
+		if(strategies.size() == 0)
+		{
+			System.err.println("Cannot create an empty generation");
+			return;
+		}
+		landscape = strategies.get(0).landscape;
+	}
+	
+	public Generation(ArrayList<Agent> strategies, int startingLocation)
+	{
+		this.agents = strategies;
+		this.startingLocation = startingLocation;
 		if(strategies.size() == 0)
 		{
 			System.err.println("Cannot create an empty generation");
@@ -68,12 +86,12 @@ public class Generation {
 
 	public Agent getBestStrategyOfGeneration()
 	{
-		this.sortStrategies();
-		return strategies.get(0);
+		this.sortAgents();
+		return agents.get(0);
 	}
 	
 	public void runAllStrategies() {
-		for(Agent strategy : strategies)
+		for(Agent strategy : agents)
 		{
 			strategy.executeStrategy();
 		}
@@ -81,40 +99,40 @@ public class Generation {
 	
 	public double averageFitness() {
 		double sumOfFitnesses = 0;
-		for(Agent strategy : strategies)
+		for(Agent strategy : agents)
 		{
 			sumOfFitnesses += strategy.phenotypeFitness;
 		}
-		return sumOfFitnesses / strategies.size();
+		return sumOfFitnesses / agents.size();
 	}
 	
 	public double averageFitnessAtStep(int step) {
 		double sumOfFitnesses = 0;
-		for(Agent strategy : strategies)
+		for(Agent strategy : agents)
 		{
 			sumOfFitnesses += strategy.fitnessArray[step];
 		}
-		return sumOfFitnesses / strategies.size();
+		return sumOfFitnesses / agents.size();
 	}
 	
 	public int getNumStrategies() {
-		return strategies.size();
+		return agents.size();
 	}
 	
 	public Agent getDirectChild(int index)
 	{
-		return strategies.get(index).identicalChild();
+		return agents.get(index).identicalChild();
 	}
 	
 	public Agent getRandomStrategy()
 	{
-		int index = SeededRandom.rnd.nextInt(strategies.size());
-		return strategies.get(index);
+		int index = SeededRandom.rnd.nextInt(agents.size());
+		return agents.get(index);
 	}
 	
 	public Agent getStrategyAtIndex(int index)
 	{
-		return strategies.get(index);
+		return agents.get(index);
 	}
 	
 	public double[] getAverageFitnessAtSteps()
@@ -129,52 +147,168 @@ public class Generation {
 	
 	public Generation getNextGenerationTruncation()
 	{
-		this.sortStrategies();
+		this.sortAgents();
 		ArrayList<Agent> nextGeneration = new ArrayList<Agent>();
 		
 		for(int i=0; i<Constants.GENERATION_SIZE/2; i++)//Add the top half
 		{
-			nextGeneration.add(strategies.get(i).identicalChild());
+			nextGeneration.add(agents.get(i).identicalChild());
 		}
 		if(Constants.GENERATION_SIZE % 2 == 1)//If odd number of generations, add one more
 		{
-			nextGeneration.add(strategies.get(Constants.GENERATION_SIZE/2+1).identicalChild());
+			nextGeneration.add(agents.get(Constants.GENERATION_SIZE/2+1).identicalChild());
 		}
 		for(int i=0; i<Constants.GENERATION_SIZE/2; i++)//Add the bottom half, but mutated
 		{
-			Agent child = strategies.get(i).identicalChild();
+			Agent child = agents.get(i).identicalChild();
 			child.mutate();
 			nextGeneration.add(child);
 		}
 		
-		return new Generation(nextGeneration);
+		if(startingLocation == -1)
+		{
+			return new Generation(nextGeneration);
+		}
+		else
+		{
+			return new Generation(nextGeneration, startingLocation);
+		}
 	}
 	
-//	public Generation getNextGenerationFitnessProportionate()
-//	{
-//		this.sortStrategies();
-//		ArrayList<Agent> nextGeneration = new ArrayList<Agent>();
-//		
-//		
-//		
-//		
-//		return new Generation(nextGeneration);
-//	}
-//	
-//	public Generation getNextGenerationRanked()
-//	{
-//		this.sortStrategies();
-//		ArrayList<Agent> nextGeneration = new ArrayList<Agent>();
-//		
-//		
-//		return new Generation(nextGeneration);
-//	}
+	public Generation getNextGenerationFitnessProportionate()
+	{
+		this.sortAgents();
+		ArrayList<Agent> nextGeneration = new ArrayList<Agent>();
+		
+		double fitnessSum = 0;
+		for(Agent a : agents)
+		{
+			fitnessSum += a.phenotypeFitness;
+		}
+		
+		for(int i=0; i<Constants.ELITISM; i++)
+		{
+			nextGeneration.add(agents.get(i).identicalChild());
+		}
+		
+		for(int i=0; i<Constants.GENERATION_SIZE-Constants.ELITISM; i++)
+		{
+			double selectedFitness = SeededRandom.rnd.nextDouble(fitnessSum);
+			Agent selected = null;
+			for(int agent=0; agent < Constants.GENERATION_SIZE; agent++)
+			{
+				selectedFitness -= agents.get(agent).phenotypeFitness;
+				if(selectedFitness <= 0)
+				{
+					selected = agents.get(agent);
+					break;
+				}
+			}
+			
+			Agent child = selected.identicalChild();
+			child.mutate();
+			nextGeneration.add(child);
+		}
+		
+		if(startingLocation == -1)
+		{
+			return new Generation(nextGeneration);
+		}
+		else
+		{
+			return new Generation(nextGeneration, startingLocation);
+		}
+	}
+	
+	
+	//https://en.wikipedia.org/wiki/Tournament_selection.  Should be fast.
+	public Generation getNextGenerationTournament()
+	{
+		this.sortAgents();
+		ArrayList<Agent> nextGeneration = new ArrayList<Agent>();
+		
+//		System.out.println(gene*
+		for(int i=0; i<Constants.ELITISM; i++)
+		{
+			nextGeneration.add(agents.get(i).identicalChild());
+		}
+		
+		for(int i=0; i<Constants.GENERATION_SIZE-Constants.ELITISM; i++)
+		{
+			Agent topOfTournament = agents.get(SeededRandom.rnd.nextInt(agents.size()));
+			for(int contestant=1; contestant < Constants.TOURNAMENT_SIZE; contestant++)
+			{
+				Agent contest = agents.get(SeededRandom.rnd.nextInt(agents.size()));
+				if(contest.phenotypeFitness > topOfTournament.phenotypeFitness)
+				{
+					topOfTournament = contest;
+				}
+			}
+			Agent child = topOfTournament.identicalChild();
+			child.mutate();
+			nextGeneration.add(child);
+		}
+		
+		if(startingLocation == -1)
+		{
+			return new Generation(nextGeneration);
+		}
+		else
+		{
+			return new Generation(nextGeneration, startingLocation);
+		}
+	}
+	
+	//These are really long, don't go saving them every generation.
+	//I would love to use a stringbuilder here, but then a race condition happens
+	public String getStringRepresentation()
+	{
+		String sb = "";
+	
+		sb = sb + "STRINGREPV1:";//If a change is ever made to stringrep, change the version so we don't try to load old versions into new versions
+		sb = sb + landscape.landscapeSeed + ":";
+		sb = sb + landscape.n + ":" + landscape.k + ":" + startingLocation + ":" + agents.size();
+		
+		for(Agent a : agents)
+		{
+			 sb = sb + ":" + a.getStringRepresentation();
+		}
+
+		return sb;
+	}
+	
+	//Get generation from string rep
+	public Generation(String stringrep)
+	{
+		String[] sr = stringrep.split(":");
+		if(!sr[0].equals("STRINGREPV1"))
+		{
+			System.out.println("Stringrep version mismatch");
+			return;//We can't do anything with the wrong version
+		}
+		
+		//Not yet made to work with dynamics.
+		landscape = new FitnessLandscape(Integer.parseInt(sr[2]), Integer.parseInt(sr[3]), Integer.parseInt(sr[1]));
+		startingLocation = Integer.parseInt(sr[4]);
+		int numAgents = Integer.parseInt(sr[5]);
+		
+		for(int agentloc = 6; agentloc < 6 + numAgents; agentloc++)
+		{
+			agents.add(new Agent(sr[agentloc], landscape));
+		}
+		
+		if(6+numAgents != sr.length)
+		{
+			System.out.println("Stringrep size mismatch, expected size " + (6+numAgents) + "but got size" + sr.length);
+		}
+	}
+
 	
 	//The code sorts it so that the best strategies are first
-	public void sortStrategies() {
-		Collections.sort(strategies);
-		Collections.reverse(strategies);
-		if(strategies.get(0).phenotypeFitness < strategies.get(strategies.size()-1).phenotypeFitness)
+	public void sortAgents() {
+		Collections.sort(agents);
+		Collections.reverse(agents);
+		if(agents.get(0).phenotypeFitness < agents.get(agents.size()-1).phenotypeFitness)
 		{
 			System.out.println("Sorting backwards");
 		}

@@ -22,7 +22,7 @@ public class EvolutionSimulation {
 	// Sumulation Paramaters (move to config file eventually)
 	DynamicFitnessLandscape landscape;
 	String simNum = "N/A";
-	String evolutionType = "N/A";
+	String selectionType = "N/A";
 	int tau;
 
 	// Instance variables
@@ -31,15 +31,38 @@ public class EvolutionSimulation {
 
 	public EvolutionSimulation(DynamicFitnessLandscape landscape, int tau) {
 		this.landscape = landscape;
-		this.evolutionType = Constants.SELECTION_TYPE;
+		this.selectionType = Constants.SELECTION_TYPE;
 		this.tau = tau;
 		setupSimulation();
+	}
+	
+	public EvolutionSimulation(DynamicFitnessLandscape landscape, int tau, String startingGeneration, int startingGenerationIndex) {
+		this.landscape = landscape;
+		this.selectionType = Constants.SELECTION_TYPE;
+		this.tau = tau;
+		
+		//insert dummies until we actuall want to resume
+		for(int i=0; i<startingGenerationIndex; i++)
+		{
+			generations.add(new Generation());
+		}
+		
+		Generation startGen = new Generation(startingGeneration);
+		startGen.runAllStrategies();
+		generations.add(startGen);
 	}
 
 	public void setupSimulation() {
 		Generation gen0;
 		if (Constants.SINGLE_START) {
-			gen0 = new Generation(landscape, SeededRandom.rnd.nextInt((int) (Math.pow(2, landscape.k))));
+			if(Constants.STARTING_LOCATION != -1)
+			{
+				gen0 = new Generation(landscape, Constants.STARTING_LOCATION);
+			}
+			else
+			{
+				gen0 = new Generation(landscape, SeededRandom.rnd.nextInt((int) (Math.pow(2, landscape.k))));
+			}
 		} else {
 			gen0 = new Generation(landscape);
 		}
@@ -52,8 +75,12 @@ public class EvolutionSimulation {
 		{
 			// Make the next generation
 			Generation nextGen;
-			if (evolutionType.toLowerCase().equals("truncation")) {
+			if (selectionType.toLowerCase().equals("truncation")) {
 				nextGen = generations.get(generations.size() - 1).getNextGenerationTruncation();
+			} else if (selectionType.toLowerCase().equals("fitprop")) {
+				nextGen = generations.get(generations.size() - 1).getNextGenerationFitnessProportionate();
+			} else if (selectionType.toLowerCase().equals("tournament")) {
+				nextGen = generations.get(generations.size() - 1).getNextGenerationTournament();
 			} else {
 				System.err.println("No valid evolution type chosen");
 				nextGen = null;
@@ -84,8 +111,17 @@ public class EvolutionSimulation {
 		csvWriter.print(SimulationHeader + "," + simNum + "," + "Landscape seed: " + landscape.landscapeSeed + ","
 				+ "K Value:" + landscape.k + "\n");
 		for (int gen = 0; gen < generations.size(); gen += Constants.INCREMENT_CSV) {
-			csvWriter.print(GenerationHeader + "," + gen + "\n");
-
+			csvWriter.print(GenerationHeader + "," + gen);
+			if(generations.get(gen).agents.size()==0)//dummy generation
+			{
+				csvWriter.print("," + "DUMMY" + "\n");
+				continue;
+			}
+			if(Constants.OUTPUT_GENSTR)
+			{
+				csvWriter.print("," + generations.get(gen).getStringRepresentation());
+			}
+			csvWriter.print("\n");
 			// Write strategy to CSV
 			csvWriter.print(ProgramRowHeader);
 			Agent bestOfGen = generations.get(gen).getBestStrategyOfGeneration();
@@ -116,49 +152,49 @@ public class EvolutionSimulation {
 			csvWriter.print("\n");
 
 			// Write E(step) and cov(step,step) to the CSV
-			Map<Step, Integer> StepToCount = new HashMap<>();
-			Map<Step, Map<Step, Integer>> StepPairToCount = new HashMap<>();
-			for (Step a : Step.validSteps) {
-				StepToCount.put(a, 0);
-				StepPairToCount.put(a, new HashMap<>());
-				for (Step b : Step.validSteps) {
-					StepPairToCount.get(a).put(b, 0);
-				}
-			}
-			for (Agent a : generations.get(gen).strategies) {
-				Map<Step, Integer> StepToCountInAgent = new HashMap<>();
-				for (Step s : Step.validSteps) {
-					StepToCountInAgent.put(s, 0);
-				}
-				for (Step s : a.totalStrategyStepArray()) {
-					StepToCountInAgent.put(s, StepToCountInAgent.get(s) + 1);
-				}
-				for (Step s1 : Step.validSteps) {
-					StepToCount.put(s1, StepToCount.get(s1) + StepToCountInAgent.get(s1));
-					for (Step s2 : Step.validSteps) {
-						StepPairToCount.get(s1).put(s2, StepPairToCount.get(s1).get(s2)
-								+ StepToCountInAgent.get(s1) * StepToCountInAgent.get(s2));
-					}
-				}
-			}
-			csvWriter.print("VALID_STEPS:,");
-			for (Step s : Step.validSteps) {
-				csvWriter.print(s.name() + ",");
-			}
-			csvWriter.print("\nExpectedValues:,");
-			for (Step s : Step.validSteps) {
-				csvWriter.printf("%s,", ((double)StepToCount.get(s) / (double)Constants.GENERATION_SIZE));
-			}
-			for (Step s1 : Step.validSteps) {
-				csvWriter.printf("\nCovarianceWith:%s,", s1.name());
-				for (Step s2 : Step.validSteps) {
-					csvWriter.printf("%s,",
-							(((double)StepToCount.get(s1)/ (double)Constants.GENERATION_SIZE)
-									* ((double)StepToCount.get(s2) / (double)Constants.GENERATION_SIZE))
-									- ((double)StepPairToCount.get(s1).get(s2)/ (double)Constants.GENERATION_SIZE));
-							//Cov(X,Y) = E(X)E(Y)-E(XY)
-				}
-			}
+//			Map<Step, Integer> StepToCount = new HashMap<>();
+//			Map<Step, Map<Step, Integer>> StepPairToCount = new HashMap<>();
+//			for (Step a : Step.validSteps) {
+//				StepToCount.put(a, 0);
+//				StepPairToCount.put(a, new HashMap<>());
+//				for (Step b : Step.validSteps) {
+//					StepPairToCount.get(a).put(b, 0);
+//				}
+//			}
+//			for (Agent a : generations.get(gen).strategies) {
+//				Map<Step, Integer> StepToCountInAgent = new HashMap<>();
+//				for (Step s : Step.validSteps) {
+//					StepToCountInAgent.put(s, 0);
+//				}
+//				for (Step s : a.totalStrategyStepArray()) {
+//					StepToCountInAgent.put(s, StepToCountInAgent.get(s) + 1);
+//				}
+//				for (Step s1 : Step.validSteps) {
+//					StepToCount.put(s1, StepToCount.get(s1) + StepToCountInAgent.get(s1));
+//					for (Step s2 : Step.validSteps) {
+//						StepPairToCount.get(s1).put(s2, StepPairToCount.get(s1).get(s2)
+//								+ StepToCountInAgent.get(s1) * StepToCountInAgent.get(s2));
+//					}
+//				}
+//			}
+//			csvWriter.print("VALID_STEPS:,");
+//			for (Step s : Step.validSteps) {
+//				csvWriter.print(s.name() + ",");
+//			}
+//			csvWriter.print("\nExpectedValues:,");
+//			for (Step s : Step.validSteps) {
+//				csvWriter.printf("%s,", ((double)StepToCount.get(s) / (double)Constants.GENERATION_SIZE));
+//			}
+//			for (Step s1 : Step.validSteps) {
+//				csvWriter.printf("\nCovarianceWith:%s,", s1.name());
+//				for (Step s2 : Step.validSteps) {
+//					csvWriter.printf("%s,",
+//							(((double)StepToCount.get(s1)/ (double)Constants.GENERATION_SIZE)
+//									* ((double)StepToCount.get(s2) / (double)Constants.GENERATION_SIZE))
+//									- ((double)StepPairToCount.get(s1).get(s2)/ (double)Constants.GENERATION_SIZE));
+//							//Cov(X,Y) = E(X)E(Y)-E(XY)
+//				}
+//			}
 			csvWriter.print("\n");
 
 		}
