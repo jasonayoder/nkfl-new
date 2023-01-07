@@ -21,19 +21,17 @@ public class Constants {
 	public static final int TOTAL_LENGTH = PROGRAM_LENGTH * BLOCK_LENGTH;
 	
 	public static final int N_START = Integer.parseInt(PropParser.getProperty("n"));
-	public static final int N_INCREMENT = Integer.parseInt(PropParser.getProperty("nIncrements"));
-	public static final int N_INCREMENT_SIZE = Integer.parseInt(PropParser.getProperty("nIncrementSize"));
+//	public static final int N_INCREMENT = Integer.parseInt(PropParser.getProperty("nIncrements"));
+//	public static final int N_INCREMENT_SIZE = Integer.parseInt(PropParser.getProperty("nIncrementSize"));
 	
 	public static final int K_START = Integer.parseInt(PropParser.getProperty("k"));
-	public static final int K_INCREMENT = Integer.parseInt(PropParser.getProperty("kIncrements"));
-	public static final int K_INCREMENT_SIZE = Integer.parseInt(PropParser.getProperty("kIncrementSize"));
+//	public static final int K_INCREMENT = Integer.parseInt(PropParser.getProperty("kIncrements"));
+//	public static final int K_INCREMENT_SIZE = Integer.parseInt(PropParser.getProperty("kIncrementSize"));
 	
 	public static final String SELECTION_TYPE = PropParser.getProperty("selectionType");
 	public static final int NUM_GENERATIONS = Integer.parseInt(PropParser.getProperty("numGenerations"));
 	public static final int GENERATION_SIZE = Integer.parseInt(PropParser.getProperty("generationSize"));
 	public static final int ELITISM = Integer.parseInt(PropParser.getProperty("elitism"));
-	public static final double PROGRAM_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("programMutationRate"));
-	public static final double BLOCK_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("blockMutationRate"));
 	public static final double GENOTYPE_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("genotypeMutationRate"));
 	public static final double BLOCK_OVERWRITE_ANY = Double.parseDouble(PropParser.getProperty("blockOverwriteAny"));
 	public static final double BLOCK_OVERWRITE_UNUSED = Double.parseDouble(PropParser.getProperty("blockOverwriteUnused"));
@@ -53,4 +51,16 @@ public class Constants {
 	//File Params
 	public static final String FILENAME = PropParser.getProperty("filename");
 	public static final int INCREMENT_CSV = Integer.parseInt(PropParser.getProperty("incrementCSVoutput"));
+	
+	//THIS IS BAD!  DO NOT COPY THIS TO REAL BRANCHES!
+	public static double PROGRAM_MUTATION_RATE = 0;
+	public static double BLOCK_MUTATION_RATE = 0;
+	//Okay badness is over
+	
+	public static final double PROGRAM_MUTATION_START = Double.parseDouble(PropParser.getProperty("programMutationRate"));
+	public static final int PROGRAM_MUTATION_INCS = Integer.parseInt(PropParser.getProperty("programMutationRateIncs"));
+	public static final double PROGRAM_MUTATION_SIZE = Double.parseDouble(PropParser.getProperty("programMutationRateIncSize"));
+	public static final double BLOCK_MUTATION_START = Double.parseDouble(PropParser.getProperty("blockMutationRate"));
+	public static final int BLOCK_MUTATION_INCS = Integer.parseInt(PropParser.getProperty("blockMutationRateIncs"));
+	public static final double BLOCK_MUTATION_SIZE = Double.parseDouble(PropParser.getProperty("blockMutationRateIncSize"));
 } 

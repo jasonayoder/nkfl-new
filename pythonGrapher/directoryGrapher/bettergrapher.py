@@ -19,7 +19,7 @@ directory = 'C:/Users/jacob/git/nkfl-new/pythonGrapher/directoryGrapher/toGraph'
 print(directory)
 
 #Someday make it extract these from the .csv
-topGen = '200'
+topGen = '100'
 genInc = '5'
 stratlen = 50
 
@@ -69,7 +69,8 @@ for filenum in range(len(filenames)):
             elif(row[0]=='TOTAL_STRATEGY_ROW'):
                 continue
             elif(row[0]=='FITNESS_ROW'):
-                dicts[filenum].get(genNum).append(float(row[len(row)-1]))
+                if(genNum <= int(topGen)):
+                    dicts[filenum].get(genNum).append(float(row[len(row)-1]))
 
 
 toPlot = []

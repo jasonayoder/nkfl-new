@@ -81,7 +81,7 @@ public class EvolutionSimulation {
 //	static final String ComparisonStrategyHeader = "COMPARISON_STRATEGIES";
 //	static final int numTestsForComparison = 1000;
 	public void writeExperimentToCSV(PrintWriter csvWriter) {
-		csvWriter.print(SimulationHeader + "," + simNum + "," + "Landscape seed: " + landscape.landscapeSeed + ","
+		csvWriter.print(SimulationHeader + "," + "PM:" + Math.round(Constants.PROGRAM_MUTATION_RATE*1000)/1000.0 + ",BM:" + Math.round(Constants.BLOCK_MUTATION_RATE*1000)/1000.0 + "," + "Landscape seed: " + landscape.landscapeSeed + ","
 				+ "K Value:" + landscape.k + "\n");
 		for (int gen = 0; gen < generations.size(); gen += Constants.INCREMENT_CSV) {
 			csvWriter.print(GenerationHeader + "," + gen + "\n");
@@ -145,20 +145,20 @@ public class EvolutionSimulation {
 			for (Step s : Step.validSteps) {
 				csvWriter.print(s.name() + ",");
 			}
-			csvWriter.print("\nExpectedValues:,");
-			for (Step s : Step.validSteps) {
-				csvWriter.printf("%s,", ((double)StepToCount.get(s) / (double)Constants.GENERATION_SIZE));
-			}
-			for (Step s1 : Step.validSteps) {
-				csvWriter.printf("\nCovarianceWith:%s,", s1.name());
-				for (Step s2 : Step.validSteps) {
-					csvWriter.printf("%s,",
-							(((double)StepToCount.get(s1)/ (double)Constants.GENERATION_SIZE)
-									* ((double)StepToCount.get(s2) / (double)Constants.GENERATION_SIZE))
-									- ((double)StepPairToCount.get(s1).get(s2)/ (double)Constants.GENERATION_SIZE));
-							//Cov(X,Y) = E(X)E(Y)-E(XY)
-				}
-			}
+//			csvWriter.print("\nExpectedValues:,");
+//			for (Step s : Step.validSteps) {
+//				csvWriter.printf("%s,", ((double)StepToCount.get(s) / (double)Constants.GENERATION_SIZE));
+//			}
+//			for (Step s1 : Step.validSteps) {
+//				csvWriter.printf("\nCovarianceWith:%s,", s1.name());
+//				for (Step s2 : Step.validSteps) {
+//					csvWriter.printf("%s,",
+//							(((double)StepToCount.get(s1)/ (double)Constants.GENERATION_SIZE)
+//									* ((double)StepToCount.get(s2) / (double)Constants.GENERATION_SIZE))
+//									- ((double)StepPairToCount.get(s1).get(s2)/ (double)Constants.GENERATION_SIZE));
+//							//Cov(X,Y) = E(X)E(Y)-E(XY)
+//				}
+//			}
 			csvWriter.print("\n");
 
 		}

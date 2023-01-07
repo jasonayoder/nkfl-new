@@ -35,7 +35,14 @@ public class ExperimentRunner {
 	public static void run(String configPath) {
 		PropParser.load(configPath);
 		
-		SeededRandom.rnd.setSeed(Constants.SEED);
+		if(Constants.SEED != -1)
+		{
+			SeededRandom.rnd.setSeed(Constants.SEED);
+		}
+		else
+		{
+			SeededRandom.rnd.setSeed(SeededRandom.rnd.nextLong());//this line does nothing :P
+		}
 		
 		int tau = Integer.MAX_VALUE;
 		try{
@@ -44,9 +51,14 @@ public class ExperimentRunner {
 			System.out.println("generationsPerCycle not provided continuing with SOP");
 		}
 		
-		System.out.println(Constants.FILENAME);
+		String filename = Constants.FILENAME;
+		if(filename.contains("RENAME"))
+		{
+			filename = ""+SeededRandom.rnd.nextInt();
+		}
+		System.out.println(filename);
 		PrintWriter csvWriter;
-		File csvFile = new File(Constants.FILENAME);
+		File csvFile = new File(filename);
 
 		//Setup CSV writer
 		try {
@@ -56,20 +68,28 @@ public class ExperimentRunner {
 			e.printStackTrace();
 			return;
 		}
+
 		
-		int maxn = Constants.N_START+(Constants.N_INCREMENT*Constants.N_INCREMENT_SIZE);
-		int maxk = Constants.K_START+(Constants.K_INCREMENT*Constants.K_INCREMENT_SIZE);
+		double maxpm = Constants.PROGRAM_MUTATION_START+(Constants.PROGRAM_MUTATION_INCS*Constants.PROGRAM_MUTATION_SIZE);
+		double maxbm = Constants.BLOCK_MUTATION_START+(Constants.BLOCK_MUTATION_INCS*Constants.BLOCK_MUTATION_SIZE);
 		
-		double numSimsTotal = (((maxn-Constants.N_START)/Math.max(1,Constants.N_INCREMENT))+1) * (((maxk-Constants.K_START)/Math.max(1,Constants.K_INCREMENT))+1) * Constants.LANDSCAPES * Constants.RUNS_PER_LANDSCAPE;
-		double numSim = 0;
+//		System.out.println(maxpm);
+//		System.out.println(maxbm);
 		
-		for(int n=Constants.N_START; n <= maxn; n += Math.max(Constants.N_INCREMENT_SIZE,1))
+		int numSimsTotal = (int)((((maxpm-Constants.PROGRAM_MUTATION_START)/Math.max(0.0001,Constants.PROGRAM_MUTATION_SIZE))+1)) * (int)((((maxbm-Constants.BLOCK_MUTATION_START)/Math.max(0.0001,Constants.BLOCK_MUTATION_SIZE))+1)) * Constants.LANDSCAPES * Constants.RUNS_PER_LANDSCAPE;
+		
+//		System.out.println((maxpm-Constants.PROGRAM_MUTATION_START)/Math.max(0.0001,Constants.PROGRAM_MUTATION_SIZE));
+		int numSim = 0;
+		
+		for(double pm=Constants.PROGRAM_MUTATION_START; pm <= maxpm; pm += Math.max(Constants.PROGRAM_MUTATION_SIZE,0.0001))
 		{
-			for(int k=Constants.K_START; k <= maxk; k += Math.max(Constants.K_INCREMENT_SIZE, 1))
+			Constants.PROGRAM_MUTATION_RATE = pm;
+			for(double bm=Constants.BLOCK_MUTATION_START; bm <= maxbm; bm += Math.max(Constants.BLOCK_MUTATION_SIZE,0.0001))
 			{
+				Constants.BLOCK_MUTATION_RATE = bm;
 				for(int landscapeNum = 0; landscapeNum < Constants.LANDSCAPES; landscapeNum++)
 				{
-					DynamicFitnessLandscape landscape = FitnessLandscapeFactory.getLandscape(n,k,SeededRandom.rnd.nextInt(),Constants.LANDSCAPE_NAME,Constants.LANDSCAPE_PARAMS);
+					DynamicFitnessLandscape landscape = FitnessLandscapeFactory.getLandscape(Constants.N_START,Constants.K_START,SeededRandom.rnd.nextInt(),Constants.LANDSCAPE_NAME,Constants.LANDSCAPE_PARAMS);
 					for(int run=0; run < Constants.RUNS_PER_LANDSCAPE; run++)
 					{
 						long startTime = System.currentTimeMillis()/1000;

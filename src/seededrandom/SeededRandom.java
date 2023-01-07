@@ -13,11 +13,11 @@ public class SeededRandom {
 	/*
 	 * Insures we only have one instance of this class
 	 */
-	public static SeededRandom getInstance() {
-		if (thisSingle == null) {
-			thisSingle = new SeededRandom();
-			rnd.setSeed(1);
-		}
-		return thisSingle;
-	}
+//	public static SeededRandom getInstance() {
+//		if (thisSingle == null) {
+//			thisSingle = new SeededRandom();
+//			rnd.setSeed(1);
+//		}
+//		return thisSingle;
+//	}
 }
