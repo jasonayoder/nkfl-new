@@ -20,6 +20,8 @@ comparisonFitnesses = []
 with open(filename) as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
+        if len(line) == 0:
+            break
         if line[0] == "GENERATION":
             # print("gen:"+line[1])
             gen=int(line[1])

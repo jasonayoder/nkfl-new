@@ -26,6 +26,10 @@ public class FitnessLandscapeFactory {
 				return new SumTempFitnessLandscape(n,k,Integer.parseInt(paramsStrings[0]),Integer.parseInt(paramsStrings[1]),Double.parseDouble(paramsStrings[2]),seed);
 			}case "TempPermFitnessLandscape":{
 				return new TempPermFitnessLandscape(n,k,Integer.parseInt(paramsStrings[0]),seed);
+			}case "EvenOddLandscape":{
+				return new EvenOddLandscape(n,k,seed);
+			}case "RandomLandscape":{
+				return new RandomLandscape(n,k,Integer.parseInt(paramsStrings[0]),Integer.parseInt(paramsStrings[1]),seed);
 			}
 			}
 		}

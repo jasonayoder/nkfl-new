@@ -118,19 +118,25 @@ public class EvolutionSimulation {
 			// Write E(step) and cov(step,step) to the CSV
 			Map<Step, Integer> StepToCount = new HashMap<>();
 			Map<Step, Map<Step, Integer>> StepPairToCount = new HashMap<>();
+			Map<Step, Map<Step, Integer>> SequentialPair = new HashMap<>();
+			Map<Step, Integer> PairStarts = new HashMap<>();
 			for (Step a : Step.validSteps) {
 				StepToCount.put(a, 0);
+				PairStarts.put(a, 0);
 				StepPairToCount.put(a, new HashMap<>());
+				SequentialPair.put(a,new HashMap<>());
 				for (Step b : Step.validSteps) {
 					StepPairToCount.get(a).put(b, 0);
+					SequentialPair.get(a).put(b, 0);
 				}
 			}
 			for (Agent a : generations.get(gen).strategies) {
 				Map<Step, Integer> StepToCountInAgent = new HashMap<>();
+				Step[] steps =  a.totalStrategyStepArray();
 				for (Step s : Step.validSteps) {
 					StepToCountInAgent.put(s, 0);
 				}
-				for (Step s : a.totalStrategyStepArray()) {
+				for (Step s : steps) {
 					StepToCountInAgent.put(s, StepToCountInAgent.get(s) + 1);
 				}
 				for (Step s1 : Step.validSteps) {
@@ -140,6 +146,11 @@ public class EvolutionSimulation {
 								+ StepToCountInAgent.get(s1) * StepToCountInAgent.get(s2));
 					}
 				}
+				for(int i = 0; i<steps.length-1; i++) {
+					PairStarts.put(steps[i], 1+PairStarts.get(steps[i]));
+					SequentialPair.get(steps[i]).put(steps[i+1],1+SequentialPair.get(steps[i]).get(steps[i+1]));
+				}
+				
 			}
 			csvWriter.print("VALID_STEPS:,");
 			for (Step s : Step.validSteps) {
@@ -153,16 +164,124 @@ public class EvolutionSimulation {
 				csvWriter.printf("\nCovarianceWith:%s,", s1.name());
 				for (Step s2 : Step.validSteps) {
 					csvWriter.printf("%s,",
+							((double)StepPairToCount.get(s1).get(s2)/ (double)Constants.GENERATION_SIZE)-
 							(((double)StepToCount.get(s1)/ (double)Constants.GENERATION_SIZE)
-									* ((double)StepToCount.get(s2) / (double)Constants.GENERATION_SIZE))
-									- ((double)StepPairToCount.get(s1).get(s2)/ (double)Constants.GENERATION_SIZE));
-							//Cov(X,Y) = E(X)E(Y)-E(XY)
+									* ((double)StepToCount.get(s2) / (double)Constants.GENERATION_SIZE)));
+							//Cov(X,Y) = E(X,Y) - E(X)E(Y)
 				}
 			}
+			for (Step s1 : Step.validSteps) {
+				csvWriter.printf("\nProbability_Given:%s,", s1.name());
+				for (Step s2 : Step.validSteps) {
+					if(PairStarts.get(s1)==0) {
+
+						csvWriter.print("0,");
+					}else {
+						csvWriter.printf("%s,",((double)SequentialPair.get(s1).get(s2)/PairStarts.get(s1)));
+					}
+				}
+			}
+			csvWriter.print("\nProbabilityEndsWith:,");
+			for (Step s1 : Step.validSteps) {
+				if(StepToCount.get(s1)==0) {
+					csvWriter.printf("%s,", 0);
+				}else {
+					csvWriter.printf("%s,", (((double)StepToCount.get(s1)-PairStarts.get(s1))/Constants.GENERATION_SIZE));
+				}
+			}
+			
 			csvWriter.print("\n");
+			writeAvgVarCount(generations.get(gen),csvWriter);
 
 		}
 
 		csvWriter.print("\n");
+	}
+
+	public void rerunFinalGen(FitnessLandscape landscape2, PrintWriter csvWriter) {
+		Generation genF = new Generation(generations.get(generations.size()-1),landscape2);
+		genF.runAllStrategies();
+		csvWriter.print(SimulationHeader + "," + simNum + ",Landscape seed:," + landscape.landscapeSeed +",N value:,"+ landscape.n+ ",K value:," + landscape.k + "\n");
+		csvWriter.print("RERUN_ON:,Landscape seed:," + landscape2.landscapeSeed +",N value:,"+ landscape2.n+ ",K value:," + landscape2.k + "\n");
+		csvWriter.print(ProgramRowHeader);
+		Agent bestOfGen = genF.getBestStrategyOfGeneration();
+		for (String step : bestOfGen.programStringArray()) {
+			csvWriter.print("," + step);
+		}
+		csvWriter.print("\n");
+
+		for (int block = 0; block < Constants.BLOCKS; block++) {
+			csvWriter.print(BlockRowHeader + "_" + block);
+			for (String step : bestOfGen.blockStringArray(block)) {
+				csvWriter.print("," + step);
+			}
+			csvWriter.print("\n");
+		}
+
+		csvWriter.print(TotalStrategyRowHeader);
+		for (String step : bestOfGen.totalStrategyStringArray()) {
+			csvWriter.print("," + step);
+		}
+		csvWriter.print("\n");
+
+		// Write fitnesses to CSV
+		csvWriter.print(FitnessRowHeader);
+		for (double d : bestOfGen.fitnessArray) {
+			csvWriter.print("," + d);
+		}
+		
+		csvWriter.print("\n");
+		writeAvgVarCount(genF,csvWriter);
+
+	}
+
+	public void rerunBestOfFinalGen(FitnessLandscape landscape2, PrintWriter csvWriter) {
+		Generation genF = new Generation(generations.get(generations.size()-1).getBestStrategyOfGeneration(),landscape2);
+		genF.runAllStrategies();
+		csvWriter.print(SimulationHeader + "," + simNum + ",Landscape seed:," + landscape.landscapeSeed +",N value:,"+ landscape.n+ ",K value:," + landscape.k + "\n");
+		csvWriter.print("RERUN_ON:,Landscape seed:," + landscape2.landscapeSeed +",N value:,"+ landscape2.n+ ",K value:," + landscape2.k + "\n");
+		Agent bestOfGen = genF.getBestStrategyOfGeneration();
+
+		// Write fitnesses to CSV
+		csvWriter.print(FitnessRowHeader);
+		for (double d : bestOfGen.fitnessArray) {
+			csvWriter.print("," + d);
+		}
+		csvWriter.print("\n");
+		writeAvgVarCount(genF,csvWriter);
+	}
+	
+	private void writeAvgVarCount(Generation g, PrintWriter csvWriter) {
+		double[] avg = new double[Constants.BLOCK_LENGTH*Constants.PROGRAM_LENGTH];
+		int count = g.getNumStrategies();
+		double[] var = new double[Constants.BLOCK_LENGTH*Constants.PROGRAM_LENGTH];
+		for(Agent a: g.strategies) {
+			count++;
+			for(int i = 0; i < avg.length; i++) {
+				avg[i]+=a.fitnessArray[i];
+			}
+		}
+		for(int i = 0; i < avg.length; i++) {
+			avg[i]/=count;
+		}
+		for(Agent a: g.strategies) {
+			for(int i = 0; i < var.length; i++) {
+				var[i] += (avg[i]-a.fitnessArray[i])*(avg[i]-a.fitnessArray[i]);
+			}
+		}
+		for(int i = 0; i < var.length; i++) {
+			var[i]/=count;
+		}
+		csvWriter.print("Average_Fitness:");
+		for (double d : avg) {
+			csvWriter.print("," + d);
+		}
+		csvWriter.print("\n");
+		csvWriter.print("Variance:");
+		for (double d : var) {
+			csvWriter.print("," + d);
+		}
+		csvWriter.print("\n");
+		csvWriter.printf("Count:,%d\n", count);
 	}
 }

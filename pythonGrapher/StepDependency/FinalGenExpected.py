@@ -32,22 +32,23 @@ with open(filename) as csvfile:
 genToStepToExpectedValue = {}
 for run in runsOfGenToStepToExpectedValue:
     for gen in run.keys():
-        genToStepToExpectedValue[gen] = {}
+        if gen not in genToStepToExpectedValue:
+            genToStepToExpectedValue[gen] = {}
         for step in run[gen].keys():
             if step not in genToStepToExpectedValue[gen].keys():
                 genToStepToExpectedValue[gen][step] = 0
             genToStepToExpectedValue[gen][step] += run[gen][step]/len(runsOfGenToStepToExpectedValue)
 
 fig = plt.figure()
-ax = fig.add_subplot(projection='3d')
+ax = fig.subplots()
 plt.xticks(range(len(stepOrder)),stepOrder)
 plt.xlabel('Steps')
 plt.ylabel('Expected Value')
-ax.set_zlabel('Generation')
-plt.title("Expected number of steps over generations")
-for gen in genToStepToExpectedValue.keys():
-    vals = []
-    for step in stepOrder:
-        vals.append(genToStepToExpectedValue[gen][step])
-    plt.bar(range(len(vals)),vals,zs=gen,)
+plt.title("Expected number of each step in final generation")
+vals = []
+for step in stepOrder:
+    vals.append(genToStepToExpectedValue[max(genToStepToExpectedValue.keys())][step])
+plt.bar(range(len(vals)),vals)
+plt.setp(ax.get_xticklabels(), rotation=15, ha="right",
+         rotation_mode="anchor")
 plt.show()

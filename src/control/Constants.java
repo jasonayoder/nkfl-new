@@ -45,6 +45,9 @@ public class Constants {
 	public static final boolean SINGLE_START = Boolean.parseBoolean(PropParser.getProperty("singleStart"));
 	public static final int SAMPLES_PER_RUN = Integer.parseInt(PropParser.getProperty("samplesPerRun"));
 	
+	public static final int PHENOTYPIC_INDEX = Integer.parseInt(PropParser.getProperty("phenotypeIndex"));
+	public static final int GENOTYPIC_INDEX = Integer.parseInt(PropParser.getProperty("genotypeIndex"));
+	
 	// Landscape Params
 	public static final int LANDSCAPE_GENERATIONS_PER_CYCLE = Integer.parseInt(PropParser.getProperty("landscapeGenerationsPerCycle"));
 	public static final String LANDSCAPE_NAME = PropParser.getProperty("landscapeName");
@@ -53,4 +56,19 @@ public class Constants {
 	//File Params
 	public static final String FILENAME = PropParser.getProperty("filename");
 	public static final int INCREMENT_CSV = Integer.parseInt(PropParser.getProperty("incrementCSVoutput"));
+	
+	
+	//Rerun Params
+	
+
+	public static final String FILENAME3 = PropParser.getProperty("filename3");
+	public static final String FILENAME2 = PropParser.getProperty("filename2");
+	public static final int N_START2 = Integer.parseInt(PropParser.getProperty("n2"));
+	public static final int N_INCREMENT2 = Integer.parseInt(PropParser.getProperty("nIncrements2"));
+	public static final int N_INCREMENT_SIZE2 = Integer.parseInt(PropParser.getProperty("nIncrementSize2"));
+	
+	public static final int K_START2 = Integer.parseInt(PropParser.getProperty("k2"));
+	public static final int K_INCREMENT2 = Integer.parseInt(PropParser.getProperty("kIncrements2"));
+	public static final int K_INCREMENT_SIZE2 = Integer.parseInt(PropParser.getProperty("kIncrementSize2"));
+	
 } 
