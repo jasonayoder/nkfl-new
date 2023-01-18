@@ -10,6 +10,7 @@ import java.util.Map;
 
 import control.Constants;
 import landscape.FitnessLandscape;
+import landscape.FitnessLandscapeFactory;
 import seededrandom.SeededRandom;
 
 /**
@@ -267,7 +268,7 @@ public class Generation {
 	
 		sb = sb + "STRINGREPV1:";//If a change is ever made to stringrep, change the version so we don't try to load old versions into new versions
 		sb = sb + landscape.landscapeSeed + ":";
-		sb = sb + landscape.n + ":" + landscape.k + ":" + startingLocation + ":" + agents.size();
+		sb = sb + landscape.n + ":" + landscape.k + ":" + Constants.LANDSCAPE_NAME + ":" + Constants.LANDSCAPE_PARAMS + ":" + startingLocation + ":" + agents.size();
 		
 		for(Agent a : agents)
 		{
@@ -281,25 +282,25 @@ public class Generation {
 	public Generation(String stringrep)
 	{
 		String[] sr = stringrep.split(":");
-		if(!sr[0].equals("STRINGREPV1"))
+		if(!sr[0].equals("STRINGREPV2"))
 		{
 			System.out.println("Stringrep version mismatch");
 			return;//We can't do anything with the wrong version
 		}
 		
 		//Not yet made to work with dynamics.
-		landscape = new FitnessLandscape(Integer.parseInt(sr[2]), Integer.parseInt(sr[3]), Integer.parseInt(sr[1]));
-		startingLocation = Integer.parseInt(sr[4]);
-		int numAgents = Integer.parseInt(sr[5]);
+		landscape = FitnessLandscapeFactory.getLandscape(Integer.parseInt(sr[2]), Integer.parseInt(sr[3]), Integer.parseInt(sr[1]), sr[4], sr[5]);
+		startingLocation = Integer.parseInt(sr[6]);
+		int numAgents = Integer.parseInt(sr[7]);
 		
-		for(int agentloc = 6; agentloc < 6 + numAgents; agentloc++)
+		for(int agentloc = 8; agentloc < 8 + numAgents; agentloc++)
 		{
 			agents.add(new Agent(sr[agentloc], landscape));
 		}
 		
-		if(6+numAgents != sr.length)
+		if(8+numAgents != sr.length)
 		{
-			System.out.println("Stringrep size mismatch, expected size " + (6+numAgents) + "but got size" + sr.length);
+			System.out.println("Stringrep size mismatch, expected size " + (8+numAgents) + "but got size" + sr.length);
 		}
 	}
 

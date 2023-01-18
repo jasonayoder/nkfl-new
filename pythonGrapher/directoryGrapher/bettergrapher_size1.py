@@ -19,9 +19,9 @@ directory = 'C:/Users/jacob/git/nkfl-new/pythonGrapher/directoryGrapher/toGraph'
 print(directory)
 
 #Someday make it extract these from the .csv
-topGen = '200'
+topGen = '500'
 genInc = '1'
-stratlen = 50
+stratlen = 25
 
 
 filenames = []
