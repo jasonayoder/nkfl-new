@@ -85,6 +85,21 @@ public class Generation {
 		landscape = strategies.get(0).landscape;
 	}
 
+	public Generation(Generation generation, FitnessLandscape landscape2) {
+		this.landscape = landscape2;
+		for(Agent a : generation.strategies) {
+			this.strategies.add(a.childOnNewLandscape(landscape2));
+		}
+	}
+
+	public Generation(Agent bestStrategyOfGeneration, FitnessLandscape landscape2) {
+		this.landscape = landscape2;
+		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
+		{
+			strategies.add(bestStrategyOfGeneration.childOnNewLandscape(landscape2));
+		}
+	}
+
 	public Agent getBestStrategyOfGeneration()
 	{
 		this.sortAgents();

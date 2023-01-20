@@ -28,6 +28,10 @@ public class FitnessLandscapeFactory {
 				return new TempPermFitnessLandscape(n,k,Integer.parseInt(paramsStrings[0]),seed);
 			}case "SimpleSequence":{
 				return new SimpleSequence(n,k,seed);
+			}case "EvenOddLandscape":{
+				return new EvenOddLandscape(n,k,seed);
+			}case "RandomLandscape":{
+				return new RandomLandscape(n,k,Integer.parseInt(paramsStrings[0]),Integer.parseInt(paramsStrings[1]),seed);
 			}
 			}
 		}

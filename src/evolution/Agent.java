@@ -543,6 +543,29 @@ public class Agent implements Comparable<Agent>{
 		return new Agent(landscape, genotype, newDP, newBS, this);
 	}
 	
+	public Agent childOnNewLandscape(FitnessLandscape landscape)
+	{
+		//create child with reinstanced program, blocksteps
+		Integer[] newDP = new Integer[developmentalProgram.length];
+		for(int i=0; i<newDP.length; i++)
+		{
+			newDP[i] = developmentalProgram[i];
+		}
+		
+		HashMap<Integer, ArrayList<Step>> newBS = new HashMap<>();
+		for(Integer bs : blockStepsMap.keySet())
+		{
+			ArrayList<Step> a = new ArrayList<Step>();
+			for(Step s : blockStepsMap.get(bs))
+			{
+				a.add(s);//it's okay to directly copy enums
+			}
+			newBS.put(bs, a);
+		}
+		
+		return new Agent(landscape, genotype, newDP, newBS, this);
+	}
+	
 	public void mutate()
 	{
 		if(Constants.GENOTYPE_MUTATION_RATE > 0)
@@ -564,7 +587,7 @@ public class Agent implements Comparable<Agent>{
 				System.err.println("Error 2-decomposing genotype");
 			}
 			
-			for(int index=0; index < phenotypeArray.length; index++)
+			for(int index=Constants.GENOTYPIC_INDEX; index < phenotypeArray.length; index++)
 			{
 				double roll = SeededRandom.rnd.nextDouble();
 				if(roll < Constants.GENOTYPE_MUTATION_RATE)

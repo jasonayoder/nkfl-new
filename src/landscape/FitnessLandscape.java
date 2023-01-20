@@ -1,7 +1,7 @@
 package landscape;
-import java.util.ArrayList;
 import java.util.Random;
 
+import control.Constants;
 import seededrandom.SeededRandom;
 
 /**
@@ -225,7 +225,7 @@ public class FitnessLandscape {
 		double greatestFitness = this.fitness(greatest);
 		
 		double testFitness;
-		for(int i = 0; i < n; i++)
+		for(int i = 0; i < Constants.PHENOTYPIC_INDEX; i++)
 		{
 			int temp = location ^ (1<<i);
 			testFitness = this.fitness(temp);
@@ -245,7 +245,7 @@ public class FitnessLandscape {
 		int locationDiff = -1; //we return -1 if location is the greatest
 		
 		double testFitness;
-		for(int i = 0; i < n; i++)
+		for(int i = 0; i < Constants.PHENOTYPIC_INDEX; i++)
 		{
 			int temp = location ^ (1<<i);
 			testFitness = this.fitness(temp);
@@ -266,7 +266,7 @@ public class FitnessLandscape {
 		int locationDiff = -1; //we return -1 if location is the greatest
 		
 		double testFitness;
-		for(int i = 0; i < n; i++)
+		for(int i = 0; i < Constants.PHENOTYPIC_INDEX; i++)
 		{
 			int temp = location ^ (1<<i);
 			testFitness = this.fitness(temp);
