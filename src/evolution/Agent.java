@@ -47,10 +47,20 @@ public class Agent implements Comparable<Agent>{
 	public double phenotypeFitness; // the current fitness of the genotype
 	public int genotype;
 	public double genotypeFitness; // save this data so we don't have to recompute it every time we reset
+	public int[] plasticity;
+
+	public int phenotypicInheritanceMask;
+	public int genotypicInheritanceMask;
+	public int developmentalAdaptationMask;
+	public int evolutionaryAdaptationMask;
 	
 	//Default constructor for random genotype
-	public Agent(FitnessLandscape landscape)
+	public Agent(FitnessLandscape landscape, int phenotypicInheritanceMask, int genotypicInheritanceMask, int developmentalAdaptationMask, int evolutionaryAdaptationMask)
 	{
+		this.phenotypicInheritanceMask = phenotypicInheritanceMask;
+		this.genotypicInheritanceMask = genotypicInheritanceMask;
+		this.developmentalAdaptationMask = developmentalAdaptationMask;
+		this.evolutionaryAdaptationMask = evolutionaryAdaptationMask;
 		this.landscape = landscape;
 		this.setupStrategy();
 		this.genotype = SeededRandom.rnd.nextInt((int)Math.pow(2, landscape.n));
@@ -60,9 +70,13 @@ public class Agent implements Comparable<Agent>{
 	}
 	
 	//Overloaded constructor for specific genotype
-	public Agent(FitnessLandscape landscape, int genotype)
+	public Agent(FitnessLandscape landscape, int genotype, int phenotypicInheritanceMask, int genotypicInheritanceMask, int developmentalAdaptationMask, int evolutionaryAdaptationMask)
 	{
-		this(landscape);
+		this(landscape, phenotypicInheritanceMask, genotypicInheritanceMask, developmentalAdaptationMask, evolutionaryAdaptationMask);
+		this.phenotypicInheritanceMask = phenotypicInheritanceMask;
+		this.genotypicInheritanceMask = genotypicInheritanceMask;
+		this.developmentalAdaptationMask = developmentalAdaptationMask;
+		this.evolutionaryAdaptationMask = evolutionaryAdaptationMask;
 		//Overwrite the random genotype with ours
 		this.genotype = genotype;
 		this.genotypeFitness = landscape.fitness(genotype);
@@ -73,6 +87,10 @@ public class Agent implements Comparable<Agent>{
 	//This constructor is specially build for making children
 	public Agent(FitnessLandscape landscape, int genotype, Integer[] developmentalProgram, HashMap<Integer, ArrayList<Step>> blockSteps, Agent parent)
 	{
+		this.phenotypicInheritanceMask = parent.phenotypicInheritanceMask;
+		this.genotypicInheritanceMask = parent.genotypicInheritanceMask;
+		this.developmentalAdaptationMask = parent.developmentalAdaptationMask;
+		this.evolutionaryAdaptationMask = parent.evolutionaryAdaptationMask;
 		//no other constructor calls because we don't want to call setupStrategy
 		this.landscape = landscape;
 		this.genotype = genotype;
@@ -352,7 +370,7 @@ public class Agent implements Comparable<Agent>{
 	
 	private void steepestClimb(int[] phenotypeArray)
 	{
-		int locationDiff = landscape.greatestNeighborBit(phenotype);
+		int locationDiff = landscape.greatestNeighborBit(phenotype,developmentalAdaptationMask);
 		stepsExecuted.add(Step.SteepestClimb);
 		actionsExecuted.add(Step.SteepestClimb);
 		if(locationDiff==-1)
@@ -365,7 +383,7 @@ public class Agent implements Comparable<Agent>{
 	
 	private void steepestFall(int[] phenotypeArray)
 	{
-		int locationDiff = landscape.leastNeighborBit(phenotype);
+		int locationDiff = landscape.leastNeighborBit(phenotype,developmentalAdaptationMask);
 		stepsExecuted.add(Step.SteepestFall);
 		actionsExecuted.add(Step.SteepestFall);
 		if(locationDiff==-1)
@@ -378,7 +396,7 @@ public class Agent implements Comparable<Agent>{
 
 	private void randomIfMinimaElseSteepestFall(int[] phenotypeArray)
 	{
-		int locationDiff = landscape.leastNeighborBit(phenotype);
+		int locationDiff = landscape.leastNeighborBit(phenotype,developmentalAdaptationMask);
 		stepsExecuted.add(Step.RandomIfMaximaElseSteepestClimb);
 		if(locationDiff==-1)
 		{
@@ -392,7 +410,7 @@ public class Agent implements Comparable<Agent>{
 	}
 	private void randomIfMaximaElseSteepestClimb(int[] phenotypeArray)
 	{
-		int locationDiff = landscape.greatestNeighborBit(phenotype);
+		int locationDiff = landscape.greatestNeighborBit(phenotype,developmentalAdaptationMask);
 		stepsExecuted.add(Step.RandomIfMaximaElseSteepestClimb);
 		if(locationDiff==-1)
 		{
@@ -566,6 +584,41 @@ public class Agent implements Comparable<Agent>{
 		return new Agent(landscape, genotype, newDP, newBS, this);
 	}
 	
+	//generates a mutated child
+	public Agent mutatedChild() {
+		Integer[] newDP = new Integer[developmentalProgram.length];
+		for(int i=0; i<newDP.length; i++)
+		{
+			newDP[i] = developmentalProgram[i];
+		}
+		
+		HashMap<Integer, ArrayList<Step>> newBS = new HashMap<>();
+		for(Integer bs : blockStepsMap.keySet())
+		{
+			ArrayList<Step> a = new ArrayList<Step>();
+			for(Step s : blockStepsMap.get(bs))
+			{
+				a.add(s);//it's okay to directly copy enums
+			}
+			newBS.put(bs, a);
+		}
+		int newgenotype = 0;
+		for(int i = 0; i<landscape.n;i++) {
+			if((genotypicInheritanceMask&(1<<i))!=0) {
+				newgenotype |= genotype&(1<<i); //inherit from the genotype
+			}else {
+				newgenotype |= phenotype&(1<<i);//inherit from the phenotype
+			}
+			if((evolutionaryAdaptationMask&(1<<i))!=0) {
+				if(SeededRandom.rnd.nextDouble()<Constants.GENOTYPE_MUTATION_RATE) {
+					newgenotype ^= 1<<i; // if we can adapt this gene evolutionarially, flip with the given odds
+				}
+			}
+		}
+		
+		return new Agent(landscape, genotype, newDP, newBS, this);
+	}
+	
 	public void mutate()
 	{
 		if(Constants.GENOTYPE_MUTATION_RATE > 0)
@@ -587,7 +640,7 @@ public class Agent implements Comparable<Agent>{
 				System.err.println("Error 2-decomposing genotype");
 			}
 			
-			for(int index=Constants.GENOTYPIC_INDEX; index < phenotypeArray.length; index++)
+			for(int index=0; index < phenotypeArray.length; index++)
 			{
 				double roll = SeededRandom.rnd.nextDouble();
 				if(roll < Constants.GENOTYPE_MUTATION_RATE)

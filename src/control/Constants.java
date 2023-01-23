@@ -51,8 +51,9 @@ public class Constants {
 	public static final int STARTING_LOCATION = Integer.parseInt(PropParser.getProperty("startLocation"));
 	public static final int SAMPLES_PER_RUN = Integer.parseInt(PropParser.getProperty("samplesPerRun"));
 	
-	public static final int PHENOTYPIC_INDEX = Integer.parseInt(PropParser.getProperty("phenotypeIndex"));
-	public static final int GENOTYPIC_INDEX = Integer.parseInt(PropParser.getProperty("genotypeIndex"));
+	public static final int PHENOTYPIC_NUM = Integer.parseInt(PropParser.getProperty("numPhenotypic"));
+	public static final int GENOTYPIC_NUM = Integer.parseInt(PropParser.getProperty("numGenotypic"));
+	public static final int EPIGENETIC_NUM = Integer.parseInt(PropParser.getProperty("numEpiGenetic"));
 	
 	// Landscape Params
 	public static final int LANDSCAPE_GENERATIONS_PER_CYCLE = Integer.parseInt(PropParser.getProperty("landscapeGenerationsPerCycle"));

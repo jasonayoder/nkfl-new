@@ -47,7 +47,7 @@ public class DynamicFitnessLandscapeAnalyzer {
 		for(int i = 0; i<100; i++) {
 			boolean isFirst = true;
 			for(int g = 1; g<1<<15;g++) {
-				if(DFL.isLocalMaxima(g)) {
+				if(DFL.isLocalMaxima(g,-1)) {
 					if(!isFirst) {
 						writer.print(",");
 					}else {

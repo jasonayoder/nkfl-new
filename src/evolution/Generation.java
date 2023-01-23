@@ -26,6 +26,11 @@ public class Generation {
 	public FitnessLandscape landscape;
 	int startingLocation = -1;
 	
+	public int phenotypicInheritanceMask;
+	public int genotypicInheritanceMask;
+	public int developmentalAdaptationMask;
+	public int evolutionaryAdaptationMask;
+	
 	public Generation()//Makes a 'dummy generation'
 	{
 		
@@ -37,23 +42,31 @@ public class Generation {
 	 * 
 	 * @param landscape FitnessLandscape
 	 */
-	public Generation(FitnessLandscape landscape)
+	public Generation(FitnessLandscape landscape, int phenotypicInheritanceMask, int genotypicInheritanceMask, int developmentalAdaptationMask, int evolutionaryAdaptationMask)
 	{
+		this.phenotypicInheritanceMask = phenotypicInheritanceMask;
+		this.genotypicInheritanceMask = genotypicInheritanceMask;
+		this.developmentalAdaptationMask = developmentalAdaptationMask;
+		this.evolutionaryAdaptationMask = evolutionaryAdaptationMask;
 		this.landscape = landscape;
 		
 		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
 		{
-			agents.add(new Agent(landscape));
+			agents.add(new Agent(landscape, phenotypicInheritanceMask, genotypicInheritanceMask,developmentalAdaptationMask,evolutionaryAdaptationMask));
 		}
 	}
 	
-	public Generation(FitnessLandscape landscape, int genotype)
+	public Generation(FitnessLandscape landscape, int genotype, int phenotypicInheritanceMask, int genotypicInheritanceMask, int developmentalAdaptationMask, int evolutionaryAdaptationMask)
 	{
 		this.landscape = landscape;
+		this.phenotypicInheritanceMask = phenotypicInheritanceMask;
+		this.genotypicInheritanceMask = genotypicInheritanceMask;
+		this.developmentalAdaptationMask = developmentalAdaptationMask;
+		this.evolutionaryAdaptationMask = evolutionaryAdaptationMask;
 		
 		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
 		{
-			agents.add(new Agent(landscape, genotype));
+			agents.add(new Agent(landscape, genotype, phenotypicInheritanceMask, genotypicInheritanceMask,developmentalAdaptationMask,evolutionaryAdaptationMask));
 		}
 	}
 	
@@ -62,9 +75,13 @@ public class Generation {
 	 * 
 	 * @param strategies
 	 */
-	public Generation(ArrayList<Agent> strategies)
+	public Generation(ArrayList<Agent> strategies, int phenotypicInheritanceMask, int genotypicInheritanceMask, int developmentalAdaptationMask, int evolutionaryAdaptationMask)
 	{
 		this.agents = strategies;
+		this.phenotypicInheritanceMask = phenotypicInheritanceMask;
+		this.genotypicInheritanceMask = genotypicInheritanceMask;
+		this.developmentalAdaptationMask = developmentalAdaptationMask;
+		this.evolutionaryAdaptationMask = evolutionaryAdaptationMask;
 		if(strategies.size() == 0)
 		{
 			System.err.println("Cannot create an empty generation");
@@ -73,9 +90,13 @@ public class Generation {
 		landscape = strategies.get(0).landscape;
 	}
 	
-	public Generation(ArrayList<Agent> strategies, int startingLocation)
+	public Generation(ArrayList<Agent> strategies, int startingLocation, int phenotypicInheritanceMask, int genotypicInheritanceMask, int developmentalAdaptationMask, int evolutionaryAdaptationMask)
 	{
 		this.agents = strategies;
+		this.phenotypicInheritanceMask = phenotypicInheritanceMask;
+		this.genotypicInheritanceMask = genotypicInheritanceMask;
+		this.developmentalAdaptationMask = developmentalAdaptationMask;
+		this.evolutionaryAdaptationMask = evolutionaryAdaptationMask;
 		this.startingLocation = startingLocation;
 		if(strategies.size() == 0)
 		{
@@ -85,18 +106,26 @@ public class Generation {
 		landscape = strategies.get(0).landscape;
 	}
 
-	public Generation(Generation generation, FitnessLandscape landscape2) {
+	public Generation(Generation generation, FitnessLandscape landscape2, int phenotypicInheritanceMask, int genotypicInheritanceMask, int developmentalAdaptationMask, int evolutionaryAdaptationMask) {
 		this.landscape = landscape2;
-		for(Agent a : generation.strategies) {
-			this.strategies.add(a.childOnNewLandscape(landscape2));
+		this.phenotypicInheritanceMask = generation.phenotypicInheritanceMask;
+		this.genotypicInheritanceMask = generation.genotypicInheritanceMask;
+		this.developmentalAdaptationMask = generation.developmentalAdaptationMask;
+		this.evolutionaryAdaptationMask = generation.evolutionaryAdaptationMask;
+		for(Agent a : generation.agents) {
+			this.agents.add(a.childOnNewLandscape(landscape2));
 		}
 	}
 
-	public Generation(Agent bestStrategyOfGeneration, FitnessLandscape landscape2) {
+	public Generation(Agent bestStrategyOfGeneration, FitnessLandscape landscape2, int phenotypicInheritanceMask, int genotypicInheritanceMask, int developmentalAdaptationMask, int evolutionaryAdaptationMask) {
 		this.landscape = landscape2;
+		this.phenotypicInheritanceMask = phenotypicInheritanceMask;
+		this.genotypicInheritanceMask = genotypicInheritanceMask;
+		this.developmentalAdaptationMask = developmentalAdaptationMask;
+		this.evolutionaryAdaptationMask = evolutionaryAdaptationMask;
 		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
 		{
-			strategies.add(bestStrategyOfGeneration.childOnNewLandscape(landscape2));
+			agents.add(bestStrategyOfGeneration.childOnNewLandscape(landscape2));
 		}
 	}
 
@@ -176,18 +205,19 @@ public class Generation {
 		}
 		for(int i=0; i<Constants.GENERATION_SIZE/2; i++)//Add the bottom half, but mutated
 		{
-			Agent child = agents.get(i).identicalChild();
-			child.mutate();
-			nextGeneration.add(child);
+//			Agent child = agents.get(i).identicalChild();
+//			child.mutate();
+//			nextGeneration.add(child);
+			nextGeneration.add(agents.get(i).mutatedChild());
 		}
 		
 		if(startingLocation == -1)
 		{
-			return new Generation(nextGeneration);
+			return new Generation(nextGeneration, phenotypicInheritanceMask, genotypicInheritanceMask, developmentalAdaptationMask, evolutionaryAdaptationMask);
 		}
 		else
 		{
-			return new Generation(nextGeneration, startingLocation);
+			return new Generation(nextGeneration, startingLocation, phenotypicInheritanceMask, genotypicInheritanceMask, developmentalAdaptationMask, evolutionaryAdaptationMask);
 		}
 	}
 	
@@ -209,7 +239,7 @@ public class Generation {
 		
 		for(int i=0; i<Constants.GENERATION_SIZE-Constants.ELITISM; i++)
 		{
-			double selectedFitness = SeededRandom.rnd.nextDouble(fitnessSum);
+			double selectedFitness = SeededRandom.rnd.nextDouble()*fitnessSum;
 			Agent selected = null;
 			for(int agent=0; agent < Constants.GENERATION_SIZE; agent++)
 			{
@@ -228,11 +258,11 @@ public class Generation {
 		
 		if(startingLocation == -1)
 		{
-			return new Generation(nextGeneration);
+			return new Generation(nextGeneration, phenotypicInheritanceMask, genotypicInheritanceMask, developmentalAdaptationMask, evolutionaryAdaptationMask);
 		}
 		else
 		{
-			return new Generation(nextGeneration, startingLocation);
+			return new Generation(nextGeneration, startingLocation, phenotypicInheritanceMask, genotypicInheritanceMask, developmentalAdaptationMask, evolutionaryAdaptationMask);
 		}
 	}
 	
@@ -260,18 +290,19 @@ public class Generation {
 					topOfTournament = contest;
 				}
 			}
-			Agent child = topOfTournament.identicalChild();
-			child.mutate();
-			nextGeneration.add(child);
+//			Agent child = topOfTournament.identicalChild();
+//			child.mutate();
+//			nextGeneration.add(child);
+			nextGeneration.add(topOfTournament.mutatedChild());
 		}
 		
 		if(startingLocation == -1)
 		{
-			return new Generation(nextGeneration);
+			return new Generation(nextGeneration, phenotypicInheritanceMask, genotypicInheritanceMask, developmentalAdaptationMask, evolutionaryAdaptationMask);
 		}
 		else
 		{
-			return new Generation(nextGeneration, startingLocation);
+			return new Generation(nextGeneration, startingLocation, phenotypicInheritanceMask, genotypicInheritanceMask, developmentalAdaptationMask, evolutionaryAdaptationMask);
 		}
 	}
 	

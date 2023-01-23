@@ -219,75 +219,83 @@ public class FitnessLandscape {
 	
 	//Not used by the landscape itself, but called by learning strategies to find their greatest neighbor
 	//Copies a lot of arrays to avoid altering location data
-	public int greatestNeighbor(int location)
+	public int greatestNeighbor(int location, int mask)
 	{
 		int greatest = location;
 		double greatestFitness = this.fitness(greatest);
 		
 		double testFitness;
-		for(int i = 0; i < Constants.PHENOTYPIC_INDEX; i++)
+		for(int i = 0; i < n; i++)
 		{
-			int temp = location ^ (1<<i);
-			testFitness = this.fitness(temp);
-			if (testFitness > greatestFitness) {
-				greatest = temp;
-				greatestFitness = testFitness;
+			if((mask&(1<<i))!=0) {
+				int temp = location ^ (1<<i);
+				testFitness = this.fitness(temp);
+				if (testFitness > greatestFitness) {
+					greatest = temp;
+					greatestFitness = testFitness;
+				}
 			}
 		}
 		return greatest;
 	}
 	
 	//the same as greatest neighbor, but returns the index of the difference between greatestNeighbor&location
-	public int greatestNeighborBit(int location)
+	public int greatestNeighborBit(int location,int mask)
 	{
 		int greatest = location;
 		double greatestFitness = this.fitness(greatest);
 		int locationDiff = -1; //we return -1 if location is the greatest
 		
 		double testFitness;
-		for(int i = 0; i < Constants.PHENOTYPIC_INDEX; i++)
+		for(int i = 0; i < n; i++)
 		{
-			int temp = location ^ (1<<i);
-			testFitness = this.fitness(temp);
-			if (testFitness > greatestFitness) {
-				locationDiff = i;
-				greatest = temp;
-				greatestFitness = testFitness;
+			if((mask&(1<<i))!=0) {
+				int temp = location ^ (1<<i);
+				testFitness = this.fitness(temp);
+				if (testFitness > greatestFitness) {
+					locationDiff = i;
+					greatest = temp;
+					greatestFitness = testFitness;
+				}
 			}
 		}
 		return locationDiff;
 	}
 	
 	//opposite of greatestNeighborBit
-	public int leastNeighborBit(int location)
+	public int leastNeighborBit(int location,int mask)
 	{
 		int greatest = location;
 		double greatestFitness = this.fitness(greatest);
 		int locationDiff = -1; //we return -1 if location is the greatest
 		
 		double testFitness;
-		for(int i = 0; i < Constants.PHENOTYPIC_INDEX; i++)
+		for(int i = 0; i < n; i++)
 		{
-			int temp = location ^ (1<<i);
-			testFitness = this.fitness(temp);
-			if (testFitness < greatestFitness) {
-				locationDiff = i;
-				greatest = temp;
-				greatestFitness = testFitness;
+			if((mask&(1<<i))!=0) {
+				int temp = location ^ (1<<i);
+				testFitness = this.fitness(temp);
+				if (testFitness < greatestFitness) {
+					locationDiff = i;
+					greatest = temp;
+					greatestFitness = testFitness;
+				}
 			}
 		}
 		return locationDiff;
 	}
 	
-	public boolean isLocalMaxima(int genotype)
+	public boolean isLocalMaxima(int genotype, int mask)
 	{
 		double fitness = this.fitness(genotype);
 
 		for (int i = 0; i < n; i++) {
-			int neighbor = genotype^(1<<i);
-
-			if (this.fitness(neighbor) > fitness) {
-				return false;
+			if((mask&(1<<i))!=0) {
+				int neighbor = genotype^(1<<i);
+	
+				if (this.fitness(neighbor) > fitness) {
+					return false;
+				}
 			}
 		}
 
