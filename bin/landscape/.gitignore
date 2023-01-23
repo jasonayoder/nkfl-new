@@ -1,0 +1,17 @@
+/CopyFitnessLandscape.class
+/DERPFitnessLandscape.class
+/DynamicFitnessLandscape.class
+/DynamicFitnessLandscapeAnalyzer.class
+/EvenOddLandscape.class
+/FitnessLandscape.class
+/FitnessLandscapeFactory.class
+/LERPFitnessLandscape.class
+/NonDynamicFitnessLandscape.class
+/PLTFitnessLandscape.class
+/RandomLandscape.class
+/SimpleSequence.class
+/SingleTempFitnessLandscape.class
+/SumTempFitnessLandscape.class
+/TempPermFitnessLandscape.class
+/Template.class
+/XorFitnessLandscape.class
