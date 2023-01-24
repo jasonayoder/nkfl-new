@@ -79,4 +79,15 @@ public class Constants {
 	public static final int K_INCREMENT2 = Integer.parseInt(PropParser.getProperty("kIncrements2"));
 	public static final int K_INCREMENT_SIZE2 = Integer.parseInt(PropParser.getProperty("kIncrementSize2"));
 	
+	public static final double PLASTICITY_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("plasticityMutationRate"));
+	public static final int[] PLASTICITY_INIT = StringToIntArray(PropParser.getProperty("plasticitySetup"));
+	
+	public static int[] StringToIntArray(String input) {
+		String[] inputs = input.split(", ");
+		int[] ints = new int[inputs.length];
+		for(int i = 0; i < inputs.length; i++) {
+			ints[i] = Integer.parseInt(inputs[i]);
+		}
+		return ints;
+	}
 } 

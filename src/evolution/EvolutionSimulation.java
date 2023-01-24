@@ -207,6 +207,14 @@ public class EvolutionSimulation {
 				csvWriter.print("," + d);
 			}
 			csvWriter.print("\n");
+			
+			csvWriter.print("Plasticities:");
+			for (int i : bestOfGen.plasticity) {
+				csvWriter.print("," + Integer.toBinaryString(i));
+			}
+			csvWriter.print("\n");
+			
+			
 
 			// Write E(step) and cov(step,step) to the CSV
 			// Map<Step, Integer> StepToCount = new HashMap<>();
