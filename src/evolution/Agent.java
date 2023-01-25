@@ -370,6 +370,7 @@ public class Agent implements Comparable<Agent>{
 	
 	private void randomWalk(int[] phenotypeArray, int mask)
 	{
+		stepsExecuted.add(Step.RandomWalk);
 		int num = 0;
 		for(int i = 0; i<landscape.n;i++) {
 			if(0!=(mask&(1<<i))) {
@@ -381,25 +382,26 @@ public class Agent implements Comparable<Agent>{
 			if(0!=(mask&(1<<i))) {
 				if(num == 0) {
 					flipPhenotypeAndArray(i, phenotypeArray);
-					stepsExecuted.add(Step.RandomWalk);
 					actionsExecuted.add(Step.RandomWalk);
 					return;
 				}
 				num--;
 			}
 		}
+		actionsExecuted.add(Step.Wait);
 	}
 	
 	private void steepestClimb(int[] phenotypeArray, int mask)
 	{
 		int locationDiff = landscape.greatestNeighborBit(phenotype, mask);
 		stepsExecuted.add(Step.SteepestClimb);
-		actionsExecuted.add(Step.SteepestClimb);
 		if(locationDiff==-1)
 		{
 			//we're at a local optima
+			actionsExecuted.add(Step.Wait);
 			return;
 		}
+		actionsExecuted.add(Step.SteepestClimb);
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
 	}
 	
@@ -407,12 +409,13 @@ public class Agent implements Comparable<Agent>{
 	{
 		int locationDiff = landscape.leastNeighborBit(phenotype, mask);
 		stepsExecuted.add(Step.SteepestFall);
-		actionsExecuted.add(Step.SteepestFall);
 		if(locationDiff==-1)
 		{
 			//we're at a local optima
+			actionsExecuted.add(Step.Wait);
 			return;
 		}
+		actionsExecuted.add(Step.SteepestFall);
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
 	}
 
@@ -439,6 +442,7 @@ public class Agent implements Comparable<Agent>{
 					num--;
 				}
 			}
+			actionsExecuted.add(Step.Wait);
 		}
 		actionsExecuted.add(Step.SteepestFall);
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
@@ -466,6 +470,7 @@ public class Agent implements Comparable<Agent>{
 					num--;
 				}
 			}
+			actionsExecuted.add(Step.Wait);
 		}
 		actionsExecuted.add(Step.SteepestClimb);
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
@@ -530,6 +535,8 @@ public class Agent implements Comparable<Agent>{
 		int genotypeTracker = phenotype;
 		//The reason we gain efficiency doing it all at once is because we would have to do this
 		//power-of-2 decomposition every single step otherwise
+		stepsExecuted.add(Step.ReturnToMaxima);
+		actionsExecuted.add(Step.ReturnToMaxima);
 		for(int i=landscape.n-1; i>=0; i--)
 		{
 			phenotypeArray[i]=0;
@@ -547,6 +554,8 @@ public class Agent implements Comparable<Agent>{
 	
 	private void returnToMinima(int[] phenotypeArray) {
 		//Copy pasted from above to ensure consistency, some code duplication....D:
+		stepsExecuted.add(Step.ReturnToMinima);
+		actionsExecuted.add(Step.ReturnToMinima);
 		phenotype = minPhenotype;
 		int genotypeTracker = phenotype;
 		//The reason we gain efficiency doing it all at once is because we would have to do this
