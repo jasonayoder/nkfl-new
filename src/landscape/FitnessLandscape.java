@@ -225,7 +225,7 @@ public class FitnessLandscape {
 		double greatestFitness = this.fitness(greatest);
 		
 		double testFitness;
-		for(int i = 0; i < Constants.PHENOTYPIC_INDEX; i++)
+		for(int i = 0; i < n; i++)
 		{
 			int temp = location ^ (1<<i);
 			testFitness = this.fitness(temp);
@@ -238,42 +238,46 @@ public class FitnessLandscape {
 	}
 	
 	//the same as greatest neighbor, but returns the index of the difference between greatestNeighbor&location
-	public int greatestNeighborBit(int location)
+	public int greatestNeighborBit(int location, int mask)
 	{
 		int greatest = location;
 		double greatestFitness = this.fitness(greatest);
 		int locationDiff = -1; //we return -1 if location is the greatest
 		
 		double testFitness;
-		for(int i = 0; i < Constants.PHENOTYPIC_INDEX; i++)
+		for(int i = 0; i < n; i++)
 		{
-			int temp = location ^ (1<<i);
-			testFitness = this.fitness(temp);
-			if (testFitness > greatestFitness) {
-				locationDiff = i;
-				greatest = temp;
-				greatestFitness = testFitness;
+			if(0!=(mask&(1<<i))) {
+				int temp = location ^ (1<<i);
+				testFitness = this.fitness(temp);
+				if (testFitness > greatestFitness) {
+					locationDiff = i;
+					greatest = temp;
+					greatestFitness = testFitness;
+				}
 			}
 		}
 		return locationDiff;
 	}
 	
 	//opposite of greatestNeighborBit
-	public int leastNeighborBit(int location)
+	public int leastNeighborBit(int location, int mask)
 	{
 		int greatest = location;
 		double greatestFitness = this.fitness(greatest);
 		int locationDiff = -1; //we return -1 if location is the greatest
 		
 		double testFitness;
-		for(int i = 0; i < Constants.PHENOTYPIC_INDEX; i++)
+		for(int i = 0; i < n; i++)
 		{
-			int temp = location ^ (1<<i);
-			testFitness = this.fitness(temp);
-			if (testFitness < greatestFitness) {
-				locationDiff = i;
-				greatest = temp;
-				greatestFitness = testFitness;
+			if(0!=(mask&(1<<i))) {
+				int temp = location ^ (1<<i);
+				testFitness = this.fitness(temp);
+				if (testFitness < greatestFitness) {
+					locationDiff = i;
+					greatest = temp;
+					greatestFitness = testFitness;
+				}
 			}
 		}
 		return locationDiff;

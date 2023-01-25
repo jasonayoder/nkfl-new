@@ -19,7 +19,7 @@ topGen = '200'
 genInc = '5'
 stratlen = 50
 
-filenames = ['P15 G5', 'P12 G8', 'P10 G6', 'P14 G10', 'P0 G0', 'P20 G20']
+filenames = ['6 old', '6 new']#['P15 G5', 'P12 G8', 'P10 G6', 'P14 G10', 'P0 G0', 'P20 G20']
 dicts = []
 for i in range(len(filenames)):
     dicts.append({})

@@ -36,7 +36,7 @@ public class Constants {
 	public static final int ELITISM = Integer.parseInt(PropParser.getProperty("elitism"));
 	public static final int TOURNAMENT_SIZE = Integer.parseInt(PropParser.getProperty("tournamentSize"));
 	
-	
+	public static final double PLASTICITY_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("plasticityMutationRate"));
 	public static final double PROGRAM_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("programMutationRate"));
 	public static final double BLOCK_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("blockMutationRate"));
 	public static final double GENOTYPE_MUTATION_RATE = Double.parseDouble(PropParser.getProperty("genotypeMutationRate"));
@@ -51,8 +51,22 @@ public class Constants {
 	public static final int STARTING_LOCATION = Integer.parseInt(PropParser.getProperty("startLocation"));
 	public static final int SAMPLES_PER_RUN = Integer.parseInt(PropParser.getProperty("samplesPerRun"));
 	
-	public static final int PHENOTYPIC_INDEX = Integer.parseInt(PropParser.getProperty("phenotypeIndex"));
-	public static final int GENOTYPIC_INDEX = Integer.parseInt(PropParser.getProperty("genotypeIndex"));
+	public static final int PHENOTYPIC_COUNT = Integer.parseInt(PropParser.getProperty("phenotypicCount"));
+	public static final int GENOTYPIC_COUNT = Integer.parseInt(PropParser.getProperty("genotypicCount"));
+	public static final int EPIGENETIC_COUNT = Integer.parseInt(PropParser.getProperty("epigeneticCount"));
+	public static final int[] PLASTICITY_INIT = parstIntegerArray(PropParser.getProperty("plasticityInit"));
+	
+	public static int[] parstIntegerArray(String array) {
+		if(array==null) {
+			return new int[0];
+		}
+		String[] elements = array.split("(, *)|( +)");
+		int[] ret = new int[elements.length];
+		for(int i = 0; i< ret.length; i++) {
+			ret[i] = Integer.parseInt(elements[i]);
+		}
+		return ret;
+	}
 	
 	// Landscape Params
 	public static final int LANDSCAPE_GENERATIONS_PER_CYCLE = Integer.parseInt(PropParser.getProperty("landscapeGenerationsPerCycle"));

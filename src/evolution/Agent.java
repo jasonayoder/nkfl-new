@@ -48,8 +48,15 @@ public class Agent implements Comparable<Agent>{
 	public int genotype;
 	public double genotypeFitness; // save this data so we don't have to recompute it every time we reset
 	
+	public final int genotypicInheritanceMask;
+	public final int phenotypicInheritanceMask;
+	public final int developmentMask;
+	public final int evolutionMask;
+	
+	public final int[] plasticity;
+	
 	//Default constructor for random genotype
-	public Agent(FitnessLandscape landscape)
+	public Agent(FitnessLandscape landscape, int genotypicInheritanceMask, int phenotypicInheritanceMask, int developmentMask, int evolutionMask)
 	{
 		this.landscape = landscape;
 		this.setupStrategy();
@@ -57,12 +64,26 @@ public class Agent implements Comparable<Agent>{
 		this.genotypeFitness = landscape.fitness(genotype);
 		this.phenotype = genotype;
 		this.phenotypeFitness = genotypeFitness;
+		this.genotypicInheritanceMask = genotypicInheritanceMask;
+		this.phenotypicInheritanceMask = phenotypicInheritanceMask;
+		this.developmentMask = developmentMask;
+		this.evolutionMask = evolutionMask;
+		this.plasticity = new int[Constants.BLOCK_LENGTH*Constants.PROGRAM_LENGTH];
+		if(Constants.PLASTICITY_INIT.length>0) {
+			for(int i = 0; i<plasticity.length; i++) {
+				plasticity[i] = Constants.PLASTICITY_INIT[(i*Constants.PLASTICITY_INIT.length)/plasticity.length];
+			}
+		}else {
+			for(int i = 0; i<plasticity.length; i++) {
+				plasticity[i] = SeededRandom.rnd.nextInt();
+			}
+		}
 	}
 	
 	//Overloaded constructor for specific genotype
-	public Agent(FitnessLandscape landscape, int genotype)
+	public Agent(FitnessLandscape landscape, int genotype, int genotypicInheritanceMask, int phenotypicInheritanceMask, int developmentMask, int evolutionMask)
 	{
-		this(landscape);
+		this(landscape, genotypicInheritanceMask, phenotypicInheritanceMask, developmentMask, evolutionMask);
 		//Overwrite the random genotype with ours
 		this.genotype = genotype;
 		this.genotypeFitness = landscape.fitness(genotype);
@@ -70,10 +91,15 @@ public class Agent implements Comparable<Agent>{
 		this.phenotypeFitness = genotypeFitness;
 	}
 	
-	//This constructor is specially build for making children
+	//This constructor is specially built for making children
 	public Agent(FitnessLandscape landscape, int genotype, Integer[] developmentalProgram, HashMap<Integer, ArrayList<Step>> blockSteps, Agent parent)
 	{
 		//no other constructor calls because we don't want to call setupStrategy
+		this.genotypicInheritanceMask = parent.genotypicInheritanceMask;
+		this.phenotypicInheritanceMask = parent.phenotypicInheritanceMask;
+		this.developmentMask = parent.developmentMask;
+		this.evolutionMask = parent.evolutionMask;
+		this.plasticity = parent.plasticity.clone();
 		this.landscape = landscape;
 		this.genotype = genotype;
 		this.genotypeFitness = landscape.fitness(genotype);
@@ -193,7 +219,7 @@ public class Agent implements Comparable<Agent>{
 //			System.out.println(block);
 			for(Step step : blockStepsMap.get(block))
 			{
-				executeStep(step, phenotypeArray);
+				executeStep(step, phenotypeArray, plasticity[stepIndex]&developmentMask);
 				
 				stepIndex = stepIndex + 1;
 				//We update fitnessArray after because of step 0, which is the fitness before we ever moved
@@ -226,35 +252,35 @@ public class Agent implements Comparable<Agent>{
 	 * 
 	 *
 	 */
-	private void executeStep(Step step, int[] phenotypeArray)
+	private void executeStep(Step step, int[] phenotypeArray,int mask)
 	{
 		//Just a note, this switch doesn't check if steps are included, that should be managed
 		//by setupStrategy() and anything that manages mutation
 		switch(step) {
 			case RandomWalk:
 				//walk randomly
-				randomWalk(phenotypeArray);
+				randomWalk(phenotypeArray,mask);
 				break;
 			case SteepestClimb:
 				//climb steeply
-				steepestClimb(phenotypeArray);
+				steepestClimb(phenotypeArray,mask);
 				break;
 			case SteepestFall:
 				//fall steeply
-				steepestFall(phenotypeArray);
+				steepestFall(phenotypeArray,mask);
 				break;
 			case RandomIfMinimaElseSteepestFall:
-				randomIfMinimaElseSteepestFall(phenotypeArray);
+				randomIfMinimaElseSteepestFall(phenotypeArray,mask);
 				break;
 			case RandomIfMaximaElseSteepestClimb:
-				randomIfMaximaElseSteepestClimb(phenotypeArray);
+				randomIfMaximaElseSteepestClimb(phenotypeArray,mask);
 				break;
 			case SameStep:
-				sameStep(phenotypeArray);
+				sameStep(phenotypeArray,mask);
 				//Do not modify stepsExecuted.  sameStep re-calls executeStep, which should then use another case to do so.
 				break;
 			case OppositeStep:
-				oppositeStep(phenotypeArray);
+				oppositeStep(phenotypeArray,mask);
 				//Do not modify stepsExecuted.  sameStep re-calls executeStep, which should then use another case to do so.
 				break;
 			case ReturnToMaxima:
@@ -264,13 +290,13 @@ public class Agent implements Comparable<Agent>{
 				returnToMinima(phenotypeArray);
 				break;
 			case SameAction:
-				sameAction(phenotypeArray);
+				sameAction(phenotypeArray,mask);
 				break;
 			case OppositeAction:
-				oppositeAction(phenotypeArray);
+				oppositeAction(phenotypeArray,mask);
 				break;
 			case Wait:
-				wait(phenotypeArray);
+				wait(phenotypeArray,mask);
 				break;
 			default:
 				System.out.println("Step not recognized: " + step);
@@ -342,17 +368,31 @@ public class Agent implements Comparable<Agent>{
 		return calculatedPhenotype == phenotype;
 	}
 	
-	private void randomWalk(int[] phenotypeArray)
+	private void randomWalk(int[] phenotypeArray, int mask)
 	{
-		int index = SeededRandom.rnd.nextInt(phenotypeArray.length);
-		flipPhenotypeAndArray(index, phenotypeArray);
-		stepsExecuted.add(Step.RandomWalk);
-		actionsExecuted.add(Step.RandomWalk);
+		int num = 0;
+		for(int i = 0; i<landscape.n;i++) {
+			if(0!=(mask&(1<<i))) {
+				num++;
+			}
+		}
+		num = SeededRandom.rnd.nextInt(num);
+		for(int i = 0; i<landscape.n;i++) {
+			if(0!=(mask&(1<<i))) {
+				if(num == 0) {
+					flipPhenotypeAndArray(i, phenotypeArray);
+					stepsExecuted.add(Step.RandomWalk);
+					actionsExecuted.add(Step.RandomWalk);
+					return;
+				}
+				num--;
+			}
+		}
 	}
 	
-	private void steepestClimb(int[] phenotypeArray)
+	private void steepestClimb(int[] phenotypeArray, int mask)
 	{
-		int locationDiff = landscape.greatestNeighborBit(phenotype);
+		int locationDiff = landscape.greatestNeighborBit(phenotype, mask);
 		stepsExecuted.add(Step.SteepestClimb);
 		actionsExecuted.add(Step.SteepestClimb);
 		if(locationDiff==-1)
@@ -363,9 +403,9 @@ public class Agent implements Comparable<Agent>{
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
 	}
 	
-	private void steepestFall(int[] phenotypeArray)
+	private void steepestFall(int[] phenotypeArray, int mask)
 	{
-		int locationDiff = landscape.leastNeighborBit(phenotype);
+		int locationDiff = landscape.leastNeighborBit(phenotype, mask);
 		stepsExecuted.add(Step.SteepestFall);
 		actionsExecuted.add(Step.SteepestFall);
 		if(locationDiff==-1)
@@ -376,30 +416,56 @@ public class Agent implements Comparable<Agent>{
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
 	}
 
-	private void randomIfMinimaElseSteepestFall(int[] phenotypeArray)
+	private void randomIfMinimaElseSteepestFall(int[] phenotypeArray, int mask)
 	{
-		int locationDiff = landscape.leastNeighborBit(phenotype);
+		int locationDiff = landscape.leastNeighborBit(phenotype, mask);
 		stepsExecuted.add(Step.RandomIfMaximaElseSteepestClimb);
 		if(locationDiff==-1)
 		{
-			int index = SeededRandom.rnd.nextInt(phenotypeArray.length);
-			flipPhenotypeAndArray(index, phenotypeArray);
-			actionsExecuted.add(Step.RandomWalk);
-			return;
+			int num = 0;
+			for(int i = 0; i<landscape.n;i++) {
+				if(0!=(mask&(1<<i))) {
+					num++;
+				}
+			}
+			num = SeededRandom.rnd.nextInt(num);
+			for(int i = 0; i<landscape.n;i++) {
+				if(0!=(mask&(1<<i))) {
+					if(num == 0) {
+						flipPhenotypeAndArray(i, phenotypeArray);
+						actionsExecuted.add(Step.RandomWalk);
+						return;
+					}
+					num--;
+				}
+			}
 		}
 		actionsExecuted.add(Step.SteepestFall);
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
 	}
-	private void randomIfMaximaElseSteepestClimb(int[] phenotypeArray)
+	private void randomIfMaximaElseSteepestClimb(int[] phenotypeArray, int mask)
 	{
-		int locationDiff = landscape.greatestNeighborBit(phenotype);
+		int locationDiff = landscape.greatestNeighborBit(phenotype,mask);
 		stepsExecuted.add(Step.RandomIfMaximaElseSteepestClimb);
 		if(locationDiff==-1)
 		{
-			int index = SeededRandom.rnd.nextInt(phenotypeArray.length);
-			flipPhenotypeAndArray(index, phenotypeArray);
-			actionsExecuted.add(Step.RandomWalk);
-			return;
+			int num = 0;
+			for(int i = 0; i<landscape.n;i++) {
+				if(0!=(mask&(1<<i))) {
+					num++;
+				}
+			}
+			num = SeededRandom.rnd.nextInt(num);
+			for(int i = 0; i<landscape.n;i++) {
+				if(0!=(mask&(1<<i))) {
+					if(num == 0) {
+						flipPhenotypeAndArray(i, phenotypeArray);
+						actionsExecuted.add(Step.RandomWalk);
+						return;
+					}
+					num--;
+				}
+			}
 		}
 		actionsExecuted.add(Step.SteepestClimb);
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
@@ -407,53 +473,53 @@ public class Agent implements Comparable<Agent>{
 	/**
 	 * @param phenotypeArray
 	 */
-	private void sameStep(int[] phenotypeArray)
+	private void sameStep(int[] phenotypeArray,int mask)
 	{
 		if(stepsExecuted.size() == 0)
 		{
-			executeStep(Step.RandomWalk, phenotypeArray);
+			executeStep(Step.RandomWalk, phenotypeArray, mask);
 		}
 		else
 		{
-			executeStep(stepsExecuted.get(stepsExecuted.size()-1), phenotypeArray);
+			executeStep(stepsExecuted.get(stepsExecuted.size()-1), phenotypeArray, mask);
 		}
 	}
-	private void oppositeStep(int[] phenotypeArray)
+	private void oppositeStep(int[] phenotypeArray, int mask)
 	{
 		if(stepsExecuted.size() == 0)
 		{
-			executeStep(Step.RandomWalk, phenotypeArray);
+			executeStep(Step.RandomWalk, phenotypeArray, mask);
 		}
 		else
 		{
-			executeStep(Step.getOppositeOfStep(stepsExecuted.get(stepsExecuted.size()-1)), phenotypeArray);
+			executeStep(Step.getOppositeOfStep(stepsExecuted.get(stepsExecuted.size()-1)), phenotypeArray, mask);
 		}
 	}
-	private void wait(int[] phenotypeArray) {
+	private void wait(int[] phenotypeArray, int mask) {
 		stepsExecuted.add(Step.Wait);
 		actionsExecuted.add(Step.Wait);
 	}
 	
-	private void sameAction(int[] phenotypeArray)
+	private void sameAction(int[] phenotypeArray, int mask)
 	{
 		if(actionsExecuted.size() == 0)
 		{
-			executeStep(Step.RandomWalk, phenotypeArray);
+			executeStep(Step.RandomWalk, phenotypeArray, mask);
 		}
 		else
 		{
-			executeStep(actionsExecuted.get(actionsExecuted.size()-1), phenotypeArray);
+			executeStep(actionsExecuted.get(actionsExecuted.size()-1), phenotypeArray, mask);
 		}
 	}
-	private void oppositeAction(int[] phenotypeArray)
+	private void oppositeAction(int[] phenotypeArray, int mask)
 	{
 		if(actionsExecuted.size() == 0)
 		{
-			executeStep(Step.RandomWalk, phenotypeArray);
+			executeStep(Step.RandomWalk, phenotypeArray, mask);
 		}
 		else
 		{
-			executeStep(Step.getOppositeOfStep(actionsExecuted.get(stepsExecuted.size()-1)), phenotypeArray);
+			executeStep(Step.getOppositeOfStep(actionsExecuted.get(stepsExecuted.size()-1)), phenotypeArray, mask);
 		}
 	}
 	
@@ -587,12 +653,14 @@ public class Agent implements Comparable<Agent>{
 				System.err.println("Error 2-decomposing genotype");
 			}
 			
-			for(int index=Constants.GENOTYPIC_INDEX; index < phenotypeArray.length; index++)
+			for(int index=0; index < phenotypeArray.length; index++)
 			{
-				double roll = SeededRandom.rnd.nextDouble();
-				if(roll < Constants.GENOTYPE_MUTATION_RATE)
-				{
-					this.flipPhenotypeAndArray(index, phenotypeArray);
+				if(0!=((evolutionMask)&(1<<index))) {
+					double roll = SeededRandom.rnd.nextDouble();
+					if(roll < Constants.GENOTYPE_MUTATION_RATE)
+					{
+						this.flipPhenotypeAndArray(index, phenotypeArray);
+					}
 				}
 			}
 			this.genotype = phenotype;
@@ -798,6 +866,16 @@ public class Agent implements Comparable<Agent>{
 //			System.out.println(block);
 			blockStepsMap.put(key, block);
 		}
+		
+		//TODO: Make these properties save with the sr
+		this.plasticity = new int[Constants.BLOCK_LENGTH*Constants.PROGRAM_LENGTH];
+		for(int i = 0; i<plasticity.length; i++) {
+			plasticity[i] = -1;
+		}
+		this.genotypicInheritanceMask = -1;
+		this.developmentMask = -1;
+		this.phenotypicInheritanceMask = 0;
+		this.evolutionMask = 0;
 	}
 	
 	/**

@@ -40,10 +40,45 @@ public class Generation {
 	public Generation(FitnessLandscape landscape)
 	{
 		this.landscape = landscape;
-		
+		int genotypicInheritanceMask = 0;
+		int phenotypicInheritanceMask = 0;
+		int developmentMask = 0;
+		int evolutionMask = 0;
+		int numPhenotypic = Constants.PHENOTYPIC_COUNT;
+		int numGenotypic = Constants.GENOTYPIC_COUNT;
+		int numEpigenetic = Constants.EPIGENETIC_COUNT;
+		int numPredisposed = landscape.n-numPhenotypic-numGenotypic-numEpigenetic;
+		for(int i = 0; i < landscape.n; i++) {
+			int roll = SeededRandom.rnd.nextInt(numPhenotypic+numGenotypic+numEpigenetic+numPredisposed);
+			if(roll<numPredisposed) {
+				numPredisposed--;
+				evolutionMask|=1<<i;
+				genotypicInheritanceMask|=1<<i;
+				developmentMask|=1<<i;
+				continue;
+			}
+			roll-=numPredisposed;
+			if(roll<numEpigenetic) {
+				numEpigenetic--;
+				phenotypicInheritanceMask|=1<<i;
+				developmentMask|=1<<i;
+				continue;
+			}
+			roll-=numEpigenetic;
+			if(roll<numGenotypic) {
+				numGenotypic--;
+				genotypicInheritanceMask|=1<<i;
+				evolutionMask|=1<<i;
+				continue;
+			}else {
+				numPhenotypic--;
+				genotypicInheritanceMask|=1<<i;
+				developmentMask|=1<<i;
+			}
+		}
 		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
 		{
-			agents.add(new Agent(landscape));
+			agents.add(new Agent(landscape,genotypicInheritanceMask,phenotypicInheritanceMask,developmentMask,evolutionMask));
 		}
 	}
 	
@@ -51,9 +86,46 @@ public class Generation {
 	{
 		this.landscape = landscape;
 		
+		int genotypicInheritanceMask = 0;
+		int phenotypicInheritanceMask = 0;
+		int developmentMask = 0;
+		int evolutionMask = 0;
+		int numPhenotypic = Constants.PHENOTYPIC_COUNT;
+		int numGenotypic = Constants.GENOTYPIC_COUNT;
+		int numEpigenetic = Constants.EPIGENETIC_COUNT;
+		int numPredisposed = landscape.n-numPhenotypic-numGenotypic-numEpigenetic;
+		for(int i = 0; i < landscape.n; i++) {
+			int roll = SeededRandom.rnd.nextInt(numPhenotypic+numGenotypic+numEpigenetic+numPredisposed);
+			if(roll<numPredisposed) {
+				numPredisposed--;
+				evolutionMask|=1<<i;
+				genotypicInheritanceMask|=1<<i;
+				developmentMask|=1<<i;
+				continue;
+			}
+			roll-=numPredisposed;
+			if(roll<numEpigenetic) {
+				numEpigenetic--;
+				phenotypicInheritanceMask|=1<<i;
+				developmentMask|=1<<i;
+				continue;
+			}
+			roll-=numEpigenetic;
+			if(roll<numGenotypic) {
+				numGenotypic--;
+				genotypicInheritanceMask|=1<<i;
+				evolutionMask|=1<<i;
+				continue;
+			}else {
+				numPhenotypic--;
+				genotypicInheritanceMask|=1<<i;
+				developmentMask|=1<<i;
+			}
+		}
+		
 		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
 		{
-			agents.add(new Agent(landscape, genotype));
+			agents.add(new Agent(landscape, genotype,genotypicInheritanceMask,phenotypicInheritanceMask,developmentMask,evolutionMask));
 		}
 	}
 	
@@ -87,8 +159,8 @@ public class Generation {
 
 	public Generation(Generation generation, FitnessLandscape landscape2) {
 		this.landscape = landscape2;
-		for(Agent a : generation.strategies) {
-			this.strategies.add(a.childOnNewLandscape(landscape2));
+		for(Agent a : generation.agents) {
+			this.agents.add(a.childOnNewLandscape(landscape2));
 		}
 	}
 
@@ -96,7 +168,7 @@ public class Generation {
 		this.landscape = landscape2;
 		for(int i = 0; i < Constants.GENERATION_SIZE; i++)
 		{
-			strategies.add(bestStrategyOfGeneration.childOnNewLandscape(landscape2));
+			agents.add(bestStrategyOfGeneration.childOnNewLandscape(landscape2));
 		}
 	}
 
@@ -209,7 +281,7 @@ public class Generation {
 		
 		for(int i=0; i<Constants.GENERATION_SIZE-Constants.ELITISM; i++)
 		{
-			double selectedFitness = SeededRandom.rnd.nextDouble(fitnessSum);
+			double selectedFitness = SeededRandom.rnd.nextDouble()*(fitnessSum);
 			Agent selected = null;
 			for(int agent=0; agent < Constants.GENERATION_SIZE; agent++)
 			{
