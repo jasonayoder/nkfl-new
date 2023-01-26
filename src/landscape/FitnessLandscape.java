@@ -240,7 +240,7 @@ public class FitnessLandscape {
 	}
 	
 	//the same as greatest neighbor, but returns the index of the difference between greatestNeighbor&location
-	public int greatestNeighborBit(int location,int mask)
+	public int greatestNeighborBit(int location, int mask)
 	{
 		int greatest = location;
 		double greatestFitness = this.fitness(greatest);
@@ -249,7 +249,7 @@ public class FitnessLandscape {
 		double testFitness;
 		for(int i = 0; i < n; i++)
 		{
-			if((mask&(1<<i))!=0) {
+			if(0!=(mask&(1<<i))) {
 				int temp = location ^ (1<<i);
 				testFitness = this.fitness(temp);
 				if (testFitness > greatestFitness) {
@@ -263,7 +263,7 @@ public class FitnessLandscape {
 	}
 	
 	//opposite of greatestNeighborBit
-	public int leastNeighborBit(int location,int mask)
+	public int leastNeighborBit(int location, int mask)
 	{
 		int greatest = location;
 		double greatestFitness = this.fitness(greatest);
@@ -272,7 +272,7 @@ public class FitnessLandscape {
 		double testFitness;
 		for(int i = 0; i < n; i++)
 		{
-			if((mask&(1<<i))!=0) {
+			if(0!=(mask&(1<<i))) {
 				int temp = location ^ (1<<i);
 				testFitness = this.fitness(temp);
 				if (testFitness < greatestFitness) {

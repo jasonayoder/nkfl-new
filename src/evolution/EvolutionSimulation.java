@@ -25,11 +25,6 @@ public class EvolutionSimulation {
 	String selectionType = "N/A";
 	int tau;
 	
-	public int phenotypicInheritanceMask;
-	public int genotypicInheritanceMask;
-	public int developmentalAdaptationMask;
-	public int evolutionaryAdaptationMask;
-
 	// Instance variables
 	public ArrayList<Generation> generations = new ArrayList<Generation>();
 	// generations ArrayList contains which step we are on
@@ -45,33 +40,6 @@ public class EvolutionSimulation {
 		this.landscape = landscape;
 		this.selectionType = Constants.SELECTION_TYPE;
 		this.tau = tau;
-		// temp solution don't know how acob might want to fix.
-		int numPhenotypic = Constants.PHENOTYPIC_NUM;
-		int numGenotypic = Constants.GENOTYPIC_NUM;
-		int numEpigenetic = Constants.EPIGENETIC_NUM;
-		int numPredisposed = landscape.n-numPhenotypic-numGenotypic-numEpigenetic;
-		
-		for(int i = 0; i<landscape.n; i++) {
-			int roll = SeededRandom.rnd.nextInt(numPredisposed+numGenotypic+numEpigenetic+numPhenotypic);
-			if(roll<numPredisposed) {
-				genotypicInheritanceMask |= 1<<i;
-				developmentalAdaptationMask |= 1<<i;
-				evolutionaryAdaptationMask |= 1<<i;
-				numPredisposed--;
-			}else if(roll<numGenotypic) {
-				genotypicInheritanceMask |= 1<<i;
-				evolutionaryAdaptationMask |= 1<<i;
-				numGenotypic--;
-			}else if(roll<numEpigenetic) {
-				phenotypicInheritanceMask |= 1<<i;
-				developmentalAdaptationMask |= 1<<i;
-				numEpigenetic--;
-			}else {
-				genotypicInheritanceMask |= 1<<i;
-				developmentalAdaptationMask |= 1<<i;
-				numPhenotypic |= 1<<i;
-			}
-		}
 		
 		//insert dummies until we actuall want to resume
 		for(int i=0; i<startingGenerationIndex; i++)
@@ -85,43 +53,19 @@ public class EvolutionSimulation {
 	}
 
 	public void setupSimulation() {
-		int numPhenotypic = Constants.PHENOTYPIC_NUM;
-		int numGenotypic = Constants.GENOTYPIC_NUM;
-		int numEpigenetic = Constants.EPIGENETIC_NUM;
-		int numPredisposed = landscape.n-numPhenotypic-numGenotypic-numEpigenetic;
-		for(int i = 0; i<landscape.n; i++) {
-			int roll = SeededRandom.rnd.nextInt(numPredisposed+numGenotypic+numEpigenetic+numPhenotypic);
-			if(roll<numPredisposed) {
-				genotypicInheritanceMask |= 1<<i;
-				developmentalAdaptationMask |= 1<<i;
-				evolutionaryAdaptationMask |= 1<<i;
-				numPredisposed--;
-			}else if(roll<numGenotypic) {
-				genotypicInheritanceMask |= 1<<i;
-				evolutionaryAdaptationMask |= 1<<i;
-				numGenotypic--;
-			}else if(roll<numEpigenetic) {
-				phenotypicInheritanceMask |= 1<<i;
-				developmentalAdaptationMask |= 1<<i;
-				numEpigenetic--;
-			}else {
-				genotypicInheritanceMask |= 1<<i;
-				developmentalAdaptationMask |= 1<<i;
-				numPhenotypic |= 1<<i;
-			}
-		}
+		
 		Generation gen0;
 		if (Constants.SINGLE_START) {
 			if(Constants.STARTING_LOCATION != -1)
 			{
-				gen0 = new Generation(landscape, Constants.STARTING_LOCATION, phenotypicInheritanceMask, genotypicInheritanceMask,developmentalAdaptationMask,evolutionaryAdaptationMask);
+				gen0 = new Generation(landscape, Constants.STARTING_LOCATION);
 			}
 			else
 			{
-				gen0 = new Generation(landscape, SeededRandom.rnd.nextInt((int) (Math.pow(2, landscape.k))), phenotypicInheritanceMask, genotypicInheritanceMask,developmentalAdaptationMask,evolutionaryAdaptationMask);
+				gen0 = new Generation(landscape, SeededRandom.rnd.nextInt((int) (Math.pow(2, landscape.k))));
 			}
 		} else {
-			gen0 = new Generation(landscape, phenotypicInheritanceMask, genotypicInheritanceMask,developmentalAdaptationMask,evolutionaryAdaptationMask);
+			gen0 = new Generation(landscape);
 		}
 		generations.add(gen0);
 		gen0.runAllStrategies();
@@ -300,7 +244,7 @@ public class EvolutionSimulation {
 	}
 
 	public void rerunFinalGen(FitnessLandscape landscape2, PrintWriter csvWriter) {
-		Generation genF = new Generation(generations.get(generations.size()-1),landscape2, phenotypicInheritanceMask, genotypicInheritanceMask,developmentalAdaptationMask,evolutionaryAdaptationMask);
+		Generation genF = new Generation(generations.get(generations.size()-1),landscape2);
 		genF.runAllStrategies();
 		csvWriter.print(SimulationHeader + "," + simNum + ",Landscape seed:," + landscape.landscapeSeed +",N value:,"+ landscape.n+ ",K value:," + landscape.k + "\n");
 		csvWriter.print("RERUN_ON:,Landscape seed:," + landscape2.landscapeSeed +",N value:,"+ landscape2.n+ ",K value:," + landscape2.k + "\n");
@@ -337,7 +281,7 @@ public class EvolutionSimulation {
 	}
 
 	public void rerunBestOfFinalGen(FitnessLandscape landscape2, PrintWriter csvWriter) {
-		Generation genF = new Generation(generations.get(generations.size()-1).getBestStrategyOfGeneration(),landscape2, phenotypicInheritanceMask, genotypicInheritanceMask,developmentalAdaptationMask,evolutionaryAdaptationMask);
+		Generation genF = new Generation(generations.get(generations.size()-1).getBestStrategyOfGeneration(),landscape2);
 		genF.runAllStrategies();
 		csvWriter.print(SimulationHeader + "," + simNum + ",Landscape seed:," + landscape.landscapeSeed +",N value:,"+ landscape.n+ ",K value:," + landscape.k + "\n");
 		csvWriter.print("RERUN_ON:,Landscape seed:," + landscape2.landscapeSeed +",N value:,"+ landscape2.n+ ",K value:," + landscape2.k + "\n");
