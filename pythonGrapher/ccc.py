@@ -19,7 +19,8 @@ topGen = '200'
 genInc = '5'
 stratlen = 50
 
-filenames = ['Plasticity Full', 'Plasticity Increase','Plasticity Decrease','Plasticity Evolved']
+filenames = ['All Phenotypic', 'All Genetic', 'All Epigenetic', 'All Primed']
+#['Plasticity Full', 'Plasticity Increase','Plasticity Decrease','Plasticity Evolved']
 #['Phenotypic + Epigenetic', 'Phenotypic + Predisposed', 'Phenotypic + Genotypic', 'Epigenetic + Predisposed', 'Epigenetic + Genotypic', 'Predisposed + Genotypic']#, 'P10 G6', 'P14 G10', 'P0 G0', 'P20 G20']
 dicts = []
 for i in range(len(filenames)):

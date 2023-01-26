@@ -387,15 +387,17 @@ public class Agent implements Comparable<Agent>{
 				num++;
 			}
 		}
+		if(num!=0) {
 		num = SeededRandom.rnd.nextInt(num);
-		for(int i = 0; i<landscape.n;i++) {
-			if(0!=(mask&(1<<i))) {
-				if(num == 0) {
-					flipPhenotypeAndArray(i, phenotypeArray);
-					actionsExecuted.add(Step.RandomWalk);
-					return;
+			for(int i = 0; i<landscape.n;i++) {
+				if(0!=(mask&(1<<i))) {
+					if(num == 0) {
+						flipPhenotypeAndArray(i, phenotypeArray);
+						actionsExecuted.add(Step.RandomWalk);
+						return;
+					}
+					num--;
 				}
-				num--;
 			}
 		}
 		actionsExecuted.add(Step.Wait);
@@ -441,18 +443,21 @@ public class Agent implements Comparable<Agent>{
 					num++;
 				}
 			}
-			num = SeededRandom.rnd.nextInt(num);
-			for(int i = 0; i<landscape.n;i++) {
-				if(0!=(mask&(1<<i))) {
-					if(num == 0) {
-						flipPhenotypeAndArray(i, phenotypeArray);
-						actionsExecuted.add(Step.RandomWalk);
-						return;
+			if(num!=0) {
+				num = SeededRandom.rnd.nextInt(num);
+				for(int i = 0; i<landscape.n;i++) {
+					if(0!=(mask&(1<<i))) {
+						if(num == 0) {
+							flipPhenotypeAndArray(i, phenotypeArray);
+							actionsExecuted.add(Step.RandomWalk);
+							return;
+						}
+						num--;
 					}
-					num--;
 				}
 			}
 			actionsExecuted.add(Step.Wait);
+			return;
 		}
 		actionsExecuted.add(Step.SteepestFall);
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
@@ -469,18 +474,21 @@ public class Agent implements Comparable<Agent>{
 					num++;
 				}
 			}
-			num = SeededRandom.rnd.nextInt(num);
-			for(int i = 0; i<landscape.n;i++) {
-				if(0!=(mask&(1<<i))) {
-					if(num == 0) {
-						flipPhenotypeAndArray(i, phenotypeArray);
-						actionsExecuted.add(Step.RandomWalk);
-						return;
+			if(num != 0) {
+				num = SeededRandom.rnd.nextInt(num);
+				for(int i = 0; i<landscape.n;i++) {
+					if(0!=(mask&(1<<i))) {
+						if(num == 0) {
+							flipPhenotypeAndArray(i, phenotypeArray);
+							actionsExecuted.add(Step.RandomWalk);
+							return;
+						}
+						num--;
 					}
-					num--;
 				}
 			}
 			actionsExecuted.add(Step.Wait);
+			return;
 		}
 		actionsExecuted.add(Step.SteepestClimb);
 		flipPhenotypeAndArray(locationDiff, phenotypeArray);
@@ -653,6 +661,21 @@ public class Agent implements Comparable<Agent>{
 	
 	public void mutate()
 	{
+		
+		if(parent!=null) {
+			for(int i = 0; i<landscape.n;i++) {
+				if(0!=(phenotypicInheritanceMask&(1<<i))) {
+					if((parent.phenotype&(1<<i))!=0) {
+						this.genotype |= 1<<i;
+						this.phenotype |= 1<<i;
+					}else {
+						this.genotype &= ~(1<<i);
+						this.phenotype &= ~(1<<i);
+					}
+				}
+			}
+		}
+		
 		if(Constants.GENOTYPE_MUTATION_RATE > 0)
 		{
 			int[] phenotypeArray = new int[landscape.n];
@@ -770,6 +793,7 @@ public class Agent implements Comparable<Agent>{
 				}
 			}
 		}
+
 	}
 	
 	public String[] programStringArray()
