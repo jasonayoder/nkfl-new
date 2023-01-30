@@ -330,7 +330,7 @@ public class Agent implements Comparable<Agent>{
 	}
 	
 	//This just checks consistency between phenotypeArray and phenotype itself.
-	private boolean ensurePheontypeConsistency(int[] phenotypeArray)
+	private boolean ensurePheontypeConsistency(int[] phenotypeArray) 
 	{
 		int calculatedPhenotype = 0;
 		for(int i=0; i<phenotypeArray.length; i++)
