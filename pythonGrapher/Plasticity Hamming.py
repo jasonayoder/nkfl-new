@@ -48,7 +48,6 @@ def plot(filename,label):
     high = [0]*len(data)
     for i in range(len(data)):
         err = np.std(data[i])/np.sqrt(len(data[i]))
-        avg[i] = np.mean(data[i])
         low[i] = avg[i]-err
         high[i] = avg[i]+err
 
@@ -56,7 +55,10 @@ def plot(filename,label):
     plt.plot(xaxis, avg,label=label)
     plt.fill_between(xaxis, low, high, alpha=0.25)
 
-labels = ['Plastic', 'Decreasing', 'Increasing', 'Evolved', 'Flip', 'Shift']
+# labels = ['Increase', 'Decrease', 'Evolved', 'Increase Evolved', 'Decrease Evolved']
+labels = ['Increase', 'Decrease', 'Increase Simple', 'Decrease Simple', 'Increase Profile Match', 'Decrease Profile Match']#['K2', 'K4', 'K6', 'K8', 'K10', 'K12', 'K14', 'K16', 'K18']
+
+# labels = ['Plastic', 'Decreasing', 'Increasing', 'Evolved', 'Flip', 'Shift']
 for label in labels:
     plot(askopenfilename(title=label),label)
 plt.legend()

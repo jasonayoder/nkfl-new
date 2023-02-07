@@ -200,6 +200,16 @@ public class Agent implements Comparable<Agent>{
 		}
 	}
 	
+	private int scalePlasticity(int plasticity) {
+		int ret = 0;
+		for(int i=0; i<32; i++) {
+			int index = i/Constants.PLASTICITY_SCALE;
+			if((plasticity&(1<<index))!=0) {
+				ret |= 1<<i;
+			}
+		}
+		return ret;
+	}
 	
 	private void executeSingleStrategy() {
 		//we will repeatedly update this array alongside the genotype to execute the strategy faster
@@ -229,7 +239,7 @@ public class Agent implements Comparable<Agent>{
 //			System.out.println(block);
 			for(Step step : blockStepsMap.get(block))
 			{
-				executeStep(step, phenotypeArray, plasticity[stepIndex]&developmentMask);
+				executeStep(step, phenotypeArray, scalePlasticity(plasticity[stepIndex])&developmentMask);
 				
 				stepIndex = stepIndex + 1;
 				//We update fitnessArray after because of step 0, which is the fitness before we ever moved

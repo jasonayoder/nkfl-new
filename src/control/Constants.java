@@ -55,6 +55,8 @@ public class Constants {
 	public static final int GENOTYPIC_COUNT = Integer.parseInt(PropParser.getProperty("numGenotypic"));
 	public static final int EPIGENETIC_COUNT = Integer.parseInt(PropParser.getProperty("numEpiGenetic"));
 	public static final int[] PLASTICITY_INIT = parstIntegerArray(PropParser.getProperty("plasticitySetup"));
+	public static final int PLASTICITY_SCALE = Integer.parseInt(PropParser.getProperty("plasticityScale"));
+	
 	
 	public static int[] parstIntegerArray(String array) {
 		if(array==null||array.equals("")) {

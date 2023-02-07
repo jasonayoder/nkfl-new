@@ -14,7 +14,7 @@ import statistics
 #filename = askopenfilename()
 
 
-def plot(filename,label,n,s):
+def plot(filename,label,n,s,count):
     runTogenToPlasticityArr = [{}]
     with open(filename) as csvfile:
         datareader = csv.reader(csvfile, delimiter=',')
@@ -39,32 +39,21 @@ def plot(filename,label,n,s):
                 if(j<len(runTogenToPlasticityArr[run][maxgen][i]) and j>=0):
                     if runTogenToPlasticityArr[run][maxgen][i][j]=='1':
                         data[i][run] += 1
-    avg = [0]*len(data)
-    low = [0]*len(data)
-    high = [0]*len(data)
-    for i in range(len(data)):
-        err = np.std(data[i])/np.sqrt(len(data[i]))
-        avg[i] = np.mean(data[i])
-        low[i] = avg[i]-err
-        high[i] = avg[i]+err
-
-    xaxis = np.arange(0,len(avg))
-    plt.plot(xaxis, avg,label=label)
-    plt.fill_between(xaxis, low, high, alpha=0.25)
+    for i in range(count):
+        run = [0]*len(data)
+        for j in range(len(data)):
+            run[j] = data[j][i]
+        xaxis = np.arange(0,len(run))
+        plt.plot(xaxis, run,label=(label+str(i)))
 
 # labels = ['Increase', 'Decrease', 'Evolved', 'Increase Evolved', 'Decrease Evolved']
-# labels = ['Increase', 'Decrease', 'Increase Simple', 'Decrease Simple', 'Increase Profile Match', 'Decrease Profile Match']#['S1', 'S2', 'S4', 'S8', 'S16']
-labels = ['Increasing', 'Decreasing', 'Plastic']
-ns = [20, 20, 20,20,20]
-ss = [1,1,1]#,8,16]
+label = 'S1_'
+n = 20
+s = 1
+count = 2
 
 # labels = ['Plastic', 'Decreasing', 'Increasing', 'Evolved']#,'Flip', 'Shift']
-for i in range(len(labels)):
-    plot(askopenfilename(title=labels[i]),labels[i],ns[0],ss[0])
+plot(askopenfilename(title=label),label,n,s,count)
 plt.legend()
-plt.ylim([0,max(ns)+1])
-plt.title(label='Increasing vs Decreasing Plasticity')
-plt.xlabel('Lifetime Step')
-plt.ylabel('Number of Plastic Sites')
-plt.legend(bbox_to_anchor=(1,1), loc="upper left")
+plt.ylim([0,n+1])
 plt.show()

@@ -19,9 +19,16 @@ topGen = '200'
 genInc = '5'
 stratlen = 50
 
-#filenames = ['All Phenotypic', 'All Genetic', 'All Epigenetic', 'All Primed']
-filenames = ['Plasticity Full', 'Plasticity Increase','Plasticity Decrease','Plasticity Evolved', 'Plasticity Flip', 'Plasticity Shift']
+# filenames = ['All Developed', 'All Evolved', 'All Epigenetic', 'All Predisposed']
+#filenames = ['Plasticity Full', 'Plasticity Increase','Plasticity Decrease','Plasticity Evolved', 'Plasticity Flip', 'Plasticity Shift']
 #filenames = ['Phenotypic + Epigenetic', 'Phenotypic + Predisposed', 'Phenotypic + Genotypic', 'Epigenetic + Predisposed', 'Epigenetic + Genotypic', 'Predisposed + Genotypic']#, 'P10 G6', 'P14 G10', 'P0 G0', 'P20 G20']
+# filenames = ['old increasing', 'old decreasing', 'new increasing', 'new decreasing']
+# filenames = ['Increase', 'Decrease', 'Increase Simple', 'Decrease Simple', 'Increase Profile Match', 'Decrease Profile Match']
+# filenames = ['K2','K10','K18']
+# filenames = ['S1','S2','S4','S8','S16']
+# filenames = ['Evolution Only', 'Developed Only', 'Evolved and Developed']
+filenames = ['Evolved', 'Random']
+
 dicts = []
 for i in range(len(filenames)):
     dicts.append({})
@@ -69,7 +76,7 @@ for filenum in range(len(filenames)):
 
 
 fig, ax = plt.subplots()
-colors = [Color("Black"), Color("Yellow"), Color("Orange"), Color("Red"), Color("Purple"), Color("Pink"), Color("Blue")]
+colors = [Color("Green"), Color("Blue"), Color("Cyan"), Color("Red"), Color("Purple"), Color("Pink"), Color("Blue")]
 namesToPlot = filenames#, 'Random Walker', 'Steepest Hill Climber', 'Balance']
 
 
@@ -132,6 +139,8 @@ plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
 plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+plt.title(label='Evo vs. Devo vs. EvoDevo')
+plt.legend(bbox_to_anchor=(1,1), loc="upper left")
 
 # plt.savefig("plotOutput/"+"fitnesses.png", dpi=300, bbox_inches='tight')
 plt.show()
