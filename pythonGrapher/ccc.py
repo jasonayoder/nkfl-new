@@ -15,7 +15,7 @@ cmaps=OrderedDict()
 #ask the user to sleect the folder containing the experiments
 # alternate = askopenfilename()
 
-topGen = '200'
+topGen = '1000'
 genInc = '5'
 stratlen = 50
 
@@ -27,7 +27,7 @@ stratlen = 50
 # filenames = ['K2','K10','K18']
 # filenames = ['S1','S2','S4','S8','S16']
 # filenames = ['Evolution Only', 'Developed Only', 'Evolved and Developed']
-filenames = ['Evolved', 'Random']
+filenames = ['Evolved', '75% Evolved 25% Developed', '50% Evolved 50% Developed', '25% Evolved 75% Developed','Developed']
 
 dicts = []
 for i in range(len(filenames)):

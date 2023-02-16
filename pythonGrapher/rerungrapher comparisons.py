@@ -35,7 +35,7 @@ def getnkToFinalFitness(filename):
     return nkToFinalFitnesses
         
 
-landscapes = ["K6", "EO K6", "Random K0..14", "XOR K6"]
+landscapes = ["K2", "K6", "K10", "K14"]#"EO K6", "Random K0..14", "XOR K6"]
 width = .8
 fig, ax = plt.subplots()
 for i in range(len(landscapes)):
