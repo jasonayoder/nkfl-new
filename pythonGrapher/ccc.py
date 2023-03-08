@@ -15,11 +15,11 @@ cmaps=OrderedDict()
 #ask the user to sleect the folder containing the experiments
 # alternate = askopenfilename()
 
-topGen = '1000'
+topGen = '200'
 genInc = '5'
 stratlen = 50
 
-# filenames = ['All Developed', 'All Evolved', 'All Epigenetic', 'All Predisposed']
+filenames = ['Learned', 'Darwinian', 'Lamarkian', 'Compound']
 #filenames = ['Plasticity Full', 'Plasticity Increase','Plasticity Decrease','Plasticity Evolved', 'Plasticity Flip', 'Plasticity Shift']
 #filenames = ['Phenotypic + Epigenetic', 'Phenotypic + Predisposed', 'Phenotypic + Genotypic', 'Epigenetic + Predisposed', 'Epigenetic + Genotypic', 'Predisposed + Genotypic']#, 'P10 G6', 'P14 G10', 'P0 G0', 'P20 G20']
 # filenames = ['old increasing', 'old decreasing', 'new increasing', 'new decreasing']
@@ -27,7 +27,7 @@ stratlen = 50
 # filenames = ['K2','K10','K18']
 # filenames = ['S1','S2','S4','S8','S16']
 # filenames = ['Evolution Only', 'Developed Only', 'Evolved and Developed']
-filenames = ['Evolved', '75% Evolved 25% Developed', '50% Evolved 50% Developed', '25% Evolved 75% Developed','Developed']
+# filenames = ['Evolved', '75% Evolved 25% Developed', '50% Evolved 50% Developed', '25% Evolved 75% Developed','Developed']
 
 dicts = []
 for i in range(len(filenames)):
@@ -139,7 +139,7 @@ plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
 plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
 plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
-plt.title(label='Evo vs. Devo vs. EvoDevo')
+plt.title(label='Performance of individuals with only one region')
 plt.legend(bbox_to_anchor=(1,1), loc="upper left")
 
 # plt.savefig("plotOutput/"+"fitnesses.png", dpi=300, bbox_inches='tight')

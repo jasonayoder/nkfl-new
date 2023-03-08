@@ -19,7 +19,9 @@ generationFitnesses = [{}]
 with open(filename) as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
-        if line[0] == "GENERATION":
+        if len(line) < 1:
+            continue
+        elif line[0] == "GENERATION":
             # print("gen:"+line[1])
             gen=int(line[1])
         elif line[0] == "HAMMING_DISTANCE_FROM_BEST":

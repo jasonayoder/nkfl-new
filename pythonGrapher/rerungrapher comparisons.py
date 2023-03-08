@@ -35,7 +35,7 @@ def getnkToFinalFitness(filename):
     return nkToFinalFitnesses
         
 
-landscapes = ["K2", "K6", "K10", "K14"]#"EO K6", "Random K0..14", "XOR K6"]
+landscapes = ["K6", "Even Odd K6", "Xor K6", "Random K6"]#["K2", "K6", "K10", "K14"]#"EO K6", "Random K0..14", "XOR K6"]
 width = .8
 fig, ax = plt.subplots()
 for i in range(len(landscapes)):
@@ -46,7 +46,7 @@ for i in range(len(landscapes)):
     error = []
     for n in nkToFinalFitnesses.keys():
         for k in nkToFinalFitnesses[n].keys():
-            labels.append(f'N:{n}K:{k}')
+            labels.append(f'K:{k}')
             data.append(np.mean(nkToFinalFitnesses[n][k]))
             error.append(np.std(nkToFinalFitnesses[n][k])/np.sqrt(len(nkToFinalFitnesses[n][k])))
     x = np.arange(len(labels))
@@ -60,5 +60,7 @@ ax.legend(bbox_to_anchor=(1,1), loc="upper left")
 # error = [np.std(nkToFinalFitnesses[n][k])/np.sqrt(len(nkToFinalFitnesses[n][k])) for k in nkToFinalFitnesses[n].keys() for n in nkToFinalFitnesses.keys()]
 # ax.bar(x=range(len(labels)),height = data,yerr=error,tick_label=labels) 
 # ax.set_xticklabels(labels)
-
+ax.set_xlabel("New Landscape Difficulty")
+ax.set_ylabel("Fitness")
+ax.set_title("Running the Final Generation on New Landscapes")
 plt.show()
